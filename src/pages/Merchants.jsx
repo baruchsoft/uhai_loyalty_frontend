@@ -1,0 +1,317 @@
+import { Button, Input, Modal, Select, Spin, Table } from "antd";
+import { useFormik } from "formik";
+import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import * as Yup from "yup";
+import {
+  deleteAPosType,
+  getAPosType,
+  resetPosTypeState,
+  updateAPosType,
+} from "../features/posTypes/posTypeSlice";
+import { addMechant, getAllMechants } from "../features/loans/merhcantSlice";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { Loading3QuartersOutlined } from "@ant-design/icons";
+import MerchantRegistration from "./MerchantRegistration";
+
+const columns = [
+  {
+    title: "#",
+    dataIndex: "key",
+  },
+  {
+    title: "Name",
+    dataIndex: "name",
+  },
+  {
+    title: "Short Description",
+    dataIndex: "shortDesc",
+  },
+  {
+    title: "Email",
+    dataIndex: "email",
+  },
+  {
+    title: "PhoneNumber",
+    dataIndex: "phoneNumber",
+  },
+  {
+    title: "Address",
+    dataIndex: "address",
+  },
+  {
+    title: "status",
+    dataIndex: "status",
+  },
+  {
+    title: "Action",
+    dataIndex: "action",
+  },
+];
+
+const POS_TYPES_SCHEMA = Yup.object().shape({
+  name: Yup.string().required("Please provide merchant name."),
+  shortDesc: Yup.string().required(
+    "Please provide merchant short description."
+  ),
+  email: Yup.string().required("Please provide email."),
+  status: Yup.string()
+    .oneOf(["ACTIVE", "INACTIVE"], "Please select a valid merchant status.")
+    .required("Please select merchant status."),
+});
+
+const Merchants = () => {
+  const dispatch = useDispatch();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedPosTypeCode, setSelectedPosTypeCode] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingPosType, setEditingPosType] = useState(false);
+
+  const getAllMechantsLoading = useSelector(
+    (state) => state?.merchant?.loading?.getAllMerchants
+  );
+  const posTypes = useSelector((state) => state?.merchant?.merchants);
+
+  console.log("posTypes", posTypes);
+
+  const addAPosTypeLoading = useSelector(
+    (state) => state?.merchant?.loading?.addMerchant
+  );
+  const updateAPosTypeLoading = useSelector(
+    (state) => state?.merchant?.loading?.updateAPosType
+  );
+  const deleteAPosTypeLoading = useSelector(
+    (state) => state?.merchant?.loading?.deleteAPosType
+  );
+
+  const addedPosType = useSelector((state) => state?.merchant?.addMerchant);
+  const updatedPosType = useSelector(
+    (state) => state?.merchant?.updatedPosType
+  );
+  const addAPosTypeSuccess = useSelector(
+    (state) => state?.posType?.success?.addAPosType
+  );
+  const updateAPosTypeSuccess = useSelector(
+    (state) => state?.posType?.success?.updateAPosType
+  );
+  const deleteAPosTypeSuccess = useSelector(
+    (state) => state?.posType?.success?.deleteAPosType
+  );
+
+  const showModal = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    setIsModalOpen(false);
+  }, []);
+
+  const showDeleteModal = useCallback(() => {
+    setIsDeleteModalOpen(true);
+  }, []);
+
+  const handleDeleteModalCancel = useCallback(() => {
+    setIsDeleteModalOpen(false);
+  }, []);
+
+  const showEditModal = async (posType) => {
+    setEditingPosType(posType);
+    setIsEditModalOpen(true);
+    await dispatch(getAPosType(posType?.posTypeCode));
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      name: editingPosType?.name || "",
+      shortDesc: editingPosType?.shortDesc || "",
+      email: editingPosType?.email || "",
+      phoneNumber: editingPosType?.phoneNumber || "",
+      address: editingPosType?.address || "",
+      status: editingPosType?.status || "INACTIVE",
+    },
+    enableReinitialize: true,
+    validationSchema: POS_TYPES_SCHEMA,
+    onSubmit: (values) => {
+      if (editingPosType) {
+        dispatch(
+          updateAPosType({
+            posTypeCode: editingPosType?.posTypeCode,
+            posTypeData: values,
+          })
+        );
+      } else {
+        dispatch(addMechant(values));
+      }
+    },
+  });
+
+  useEffect(() => {
+    dispatch(getAllMechants());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (addedPosType && addAPosTypeSuccess) {
+      formik.resetForm();
+      setIsModalOpen(false);
+      dispatch(resetPosTypeState());
+      dispatch(getAllMechants());
+    }
+  }, [addedPosType, addAPosTypeSuccess, dispatch]);
+
+  useEffect(() => {
+    if (updatedPosType && updateAPosTypeSuccess) {
+      formik.resetForm();
+      setIsEditModalOpen(false);
+      dispatch(resetPosTypeState());
+      dispatch(getAllMechants());
+      setEditingPosType(null);
+    }
+  }, [updatedPosType, updateAPosTypeSuccess, dispatch]);
+
+  const dataSource =
+    posTypes && Array.isArray(posTypes)
+      ? posTypes.map((posType, index) => ({
+          key: index + 1,
+          name: posType?.name,
+          shortDesc: posType?.shortDesc,
+          email: posType?.email,
+          phoneNumber: posType?.phoneNumber,
+          address: posType?.address,
+          status: posType?.status,
+          action: (
+            <>
+              <div className="flex flex-row items-center gap-8 ">
+                <button type="button" onClick={() => showEditModal(posType)}>
+                  <FaEdit className="text-blue-600 font-medium text-xl" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedPosTypeCode(posType?.id);
+                    showDeleteModal();
+                  }}
+                >
+                  <MdDelete className="text-red-600  font-medium  text-xl" />
+                </button>
+              </div>
+            </>
+          ),
+        }))
+      : [];
+
+  const deletePosType = async () => {
+    if (selectedPosTypeCode) {
+      await dispatch(deleteAPosType(selectedPosTypeCode));
+    }
+  };
+
+  useEffect(() => {
+    if (deleteAPosTypeSuccess) {
+      setIsDeleteModalOpen(false);
+      setSelectedPosTypeCode(null);
+      dispatch(resetPosTypeState());
+      dispatch(getAllMechants());
+    }
+  }, [deleteAPosTypeSuccess, dispatch]);
+
+  return (
+    <div className="font-sans">
+      <div className="flex justify-between mb-2">
+        <h2 className="text-xl font-bold">Merchants</h2>
+        <div>
+          <Button
+            type="primary"
+            htmlType="button"
+            href="/admin/loans/merchants/create-merchant"
+            onClick={showModal}
+            className="text-sm font-semibold px-4 h-10 text-white font-sans "
+          >
+            + Merchant
+          </Button>
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <Input
+          style={{ width: "400px", height: "40px" }}
+          placeholder="Search..."
+        />
+      </div>
+      <div>
+        {getAllMechantsLoading ? (
+          <div className="flex flex-row items-center justify-center mt-20">
+            <Spin
+              indicator={
+                <Loading3QuartersOutlined
+                  style={{
+                    fontSize: 40,
+                    color: "#000",
+                  }}
+                  spin
+                />
+              }
+            />
+          </div>
+        ) : (
+          <div style={{ overflowX: "auto", width: "100%" }}>
+            <Table
+              columns={columns}
+              dataSource={dataSource}
+              scroll={{ x: "max-content" }}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* delete merchant modal */}
+      <Modal
+        title="Confirm merchant deletion?"
+        open={isDeleteModalOpen}
+        footer={null}
+        onCancel={handleDeleteModalCancel}
+      >
+        <div>
+          <p className="text-sm">
+            Are you sure you want to delete this merchant?{" "}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-end  mt-6  gap-8">
+          <Button
+            htmlType="button"
+            onClick={handleDeleteModalCancel}
+            className="w-28 text-sm font-semibold h-10 font-sans"
+          >
+            Cancel
+          </Button>
+
+          {deleteAPosTypeLoading ? (
+            <Button
+              type="primary"
+              htmlType="button"
+              loading
+              className="w-28 text-sm font-semibold h-10 text-white font-sans"
+            >
+              Please wait...
+            </Button>
+          ) : (
+            <Button
+              onClick={deletePosType}
+              type="primary"
+              htmlType="button"
+              disabled={deleteAPosTypeLoading}
+              className="w-28 text-sm font-semibold h-10 text-white font-sans"
+            >
+              Delete
+            </Button>
+          )}
+        </div>
+      </Modal>
+    </div>
+  );
+};
+
+export default Merchants;
