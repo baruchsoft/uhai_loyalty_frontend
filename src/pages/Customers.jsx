@@ -15,8 +15,8 @@ import { getAllVillages } from "../features/village/villageSlice";
 import { getAllCampuses } from "../features/campus/campusSlice";
 import { getAllUniversities } from "../features/university/universitySlice";
 import { getAllPoses } from "../features/pos/posSlice";
-import { MdDelete } from "react-icons/md";
-import { FaEdit } from "react-icons/fa";
+import { MdDelete, MdOutlineEdit } from "react-icons/md";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 
 const columns = [
@@ -147,6 +147,7 @@ const Customers = () => {
   const counties = useSelector((state)=> state?.county?.counties);
   const constituencies = useSelector((state)=>state?.constituency?.constituencies);
   const wards = useSelector((state)=>state?.ward?.wards);
+  console.log(wards,"=>wards")
   const locations = useSelector((state)=>state?.location?.locations);
   const subLocations = useSelector((state)=> state?.subLocation?.subLocations);
   const villages  = useSelector((state)=>state?.village?.villages);
@@ -220,10 +221,10 @@ const Customers = () => {
                 <>
                   <div className="flex flex-row items-center gap-8">
                     <button type="button" onClick={() => showEditModal(customer)}>
-                      <FaEdit className="text-blue-600 font-normal text-xl" />
+                      <MdOutlineEdit className="text-blue-600 font-normal text-xl" />
                     </button>
                     <button type="button" onClick={() => {setSelectedCustomerId(customer?.id);showDeleteModal();}}>
-                      <MdDelete className="text-red-600 font-normal text-xl" />
+                      <RiDeleteBinLine className="text-red-600 font-normal text-xl" />
                     </button>
                   </div>
                 </>
@@ -242,8 +243,19 @@ const Customers = () => {
       if(updateCustomerSuccess){
         formik.resetForm()
         setIsEditModalOpen(false)
-        dispatch(getAllCustomers())
         setEditingCustomer(null)
+        dispatch(resetCustomerState())
+        dispatch(getAllCustomers());
+        dispatch(getAllCountries());
+        dispatch(getAllCounties());
+        dispatch(getAllConstituencies());
+        dispatch(getAllWards());
+        dispatch(getAllLocations());
+        dispatch(getAllSubLocations());
+        dispatch(getAllVillages());
+        dispatch(getAllUniversities())
+        dispatch(getAllCampuses())
+        dispatch(getAllPoses())
       }
      },[registerCustomerSuccess,updateCustomerSuccess])
 
@@ -295,7 +307,7 @@ const Customers = () => {
                     }}
                     onChange={formik.handleChange}
                     value={formik.values.fullName}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${ formik.touched.fullName && formik.errors.fullName ? "border-red-600" : "" }`}/>
+                    className={`w-80 lg:w-72 md:w-64 h-11${ formik.touched.fullName && formik.errors.fullName ? "border-red-600" : "" }`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.fullName && formik.errors.fullName}</p>
                   </div>
@@ -307,7 +319,7 @@ const Customers = () => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     value={formik.values.email}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${ formik.touched.email && formik.errors.email ? "border-red-600" : "" }`}/>
+                    className={`w-80 lg:w-72 md:w-64 h-11 ${ formik.touched.email && formik.errors.email ? "border-red-600" : "" }`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.email && formik.errors.email}</p>
                   </div>
@@ -321,7 +333,7 @@ const Customers = () => {
                     onBlur={formik.handleBlur} 
                     onChange={formik.handleChange} 
                     value={formik.values.primaryPhone}
-                    className={`w-80 lg:w-72 h-11 md:w-64 border-1.5 ${ formik.touched.primaryPhone && formik.errors.primaryPhone? "border-red-600" : ""}`}/>
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${ formik.touched.primaryPhone && formik.errors.primaryPhone? "border-red-600" : ""}`}/>
                   <div>
                     <p className="text-xs text-red-600"> {formik.touched.primaryPhone && formik.errors.primaryPhone}</p>
                   </div>
@@ -334,7 +346,7 @@ const Customers = () => {
                     onBlur={formik.handleBlur} 
                     onChange={formik.handleChange} 
                     value={formik.values.alternatePhone}
-                    className={`w-80 lg:w-72 h-11 md:w-64 border-1.5 ${ formik.touched.alternatePhone && formik.errors.alternatePhone? "border-red-600" : ""}`}/>
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${ formik.touched.alternatePhone && formik.errors.alternatePhone? "border-red-600" : ""}`}/>
                   <div>
                     <p className="text-xs text-red-600"> {formik.touched.alternatePhone && formik.errors.alternatePhone}</p>
                   </div>
@@ -346,7 +358,7 @@ const Customers = () => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     value={formik.values.nationalId}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${
+                    className={`w-80 lg:w-72 md:w-64 h-11${
                       formik.touched.nationalId && formik.errors.nationalId
                         ? "border-red-600"
                         : ""
@@ -373,7 +385,7 @@ const Customers = () => {
                         ? poses &&
                           poses.map((pos) => ({
                             value: pos.posCode,
-                            label: pos.posName,
+                            label: pos.groupName,
                           }))
                         : []
                     }
@@ -382,7 +394,7 @@ const Customers = () => {
                       formik.setFieldValue("posAccntId", value || "")
                     }
                     value={formik.values.posAccntId || undefined}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${
                       formik.touched.posAccntId &&
                       formik.errors.posAccntId
                         ? "border-red-600"
@@ -401,7 +413,7 @@ const Customers = () => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     value={formik.values.inpl}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${
+                    className={`w-80 lg:w-72 md:w-64 h-11 ${
                       formik.touched.inpl && formik.errors.inpl
                         ? "border-red-600"
                         : ""
@@ -437,7 +449,7 @@ const Customers = () => {
                       formik.setFieldValue("customerStatus", value || "")
                     }
                     value={formik.values.customerStatus || undefined }
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${ formik.touched.customerStatus && formik.errors.customerStatus ? "border-red-600" : "" }`} />
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${ formik.touched.customerStatus && formik.errors.customerStatus ? "border-red-600" : "" }`} />
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.customerStatus && formik.errors.customerStatus}</p>
                   </div>
@@ -468,7 +480,7 @@ const Customers = () => {
                       formik.setFieldValue("universityCode", value || "")
                     }
                     value={formik.values.universityCode || undefined}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${
+                    className={`w-80 lg:w-72 h-11  md:w-64 ${
                       formik.touched.universityCode &&
                       formik.errors.universityCode
                         ? "border-red-600"
@@ -503,7 +515,7 @@ const Customers = () => {
                       formik.setFieldValue("campusCode", value || "")
                     }
                     value={formik.values.campusCode || undefined }
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${
                       formik.touched.campusCode &&
                       formik.errors.campusCode
                         ? "border-red-600"
@@ -523,7 +535,7 @@ const Customers = () => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     value={formik.values.yearOfStudy}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${ formik.touched.yearOfStudy && formik.errors.yearOfStudy ? "border-red-600" : "" }`}/>
+                    className={`w-80 lg:w-72 md:w-64 h-11 ${ formik.touched.yearOfStudy && formik.errors.yearOfStudy ? "border-red-600" : "" }`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.yearOfStudy && formik.errors.yearOfStudy}</p>
                   </div>
@@ -540,7 +552,7 @@ const Customers = () => {
                     }}
                     onChange={formik.handleChange}
                     value={formik.values.programme}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${ formik.touched.programme && formik.errors.programme ? "border-red-600" : "" }`}/>
+                    className={`w-80 lg:w-72 md:w-64 h-11 ${ formik.touched.programme && formik.errors.programme ? "border-red-600" : "" }`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.programme && formik.errors.programme}</p>
                   </div>
@@ -552,7 +564,7 @@ const Customers = () => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     value={formik.values.studentId}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${ formik.touched.studentId && formik.errors.studentId ? "border-red-600" : "" }`}/>
+                    className={`w-80 lg:w-72 md:w-64 h-11 ${ formik.touched.studentId && formik.errors.studentId ? "border-red-600" : "" }`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.studentId && formik.errors.studentId}</p>
                   </div>
@@ -568,7 +580,7 @@ const Customers = () => {
                     }}
                     onChange={formik.handleChange}
                     value={formik.values.nextOfKinName}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${ formik.touched.nextOfKinName && formik.errors.nextOfKinName ? "border-red-600" : "" }`}/>
+                    className={`w-80 lg:w-72 md:w-64 h-11 ${ formik.touched.nextOfKinName && formik.errors.nextOfKinName ? "border-red-600" : "" }`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.nextOfKinName && formik.errors.nextOfKinName}</p>
                   </div>
@@ -580,7 +592,7 @@ const Customers = () => {
                     onBlur={formik.handleBlur} 
                     onChange={formik.handleChange} 
                     value={formik.values.nextOfKinMobile}
-                    className={`w-80 lg:w-72 h-11 md:w-64 border-1.5 ${ formik.touched.nextOfKinMobile && formik.errors.nextOfKinMobile? "border-red-600" : ""}`}/>
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${ formik.touched.nextOfKinMobile && formik.errors.nextOfKinMobile? "border-red-600" : ""}`}/>
                   <div>
                     <p className="text-xs text-red-600"> {formik.touched.nextOfKinMobile && formik.errors.nextOfKinMobile}</p>
                   </div>
@@ -634,7 +646,7 @@ const Customers = () => {
                       formik.setFieldValue("nextOfKinRelationship", value || "")
                     }
                     value={formik.values.nextOfKinRelationship || undefined }
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${ formik.touched.nextOfKinRelationship && formik.errors.nextOfKinRelationship ? "border-red-600" : "" }`} />
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${ formik.touched.nextOfKinRelationship && formik.errors.nextOfKinRelationship ? "border-red-600" : "" }`} />
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.nextOfKinRelationship && formik.errors.nextOfKinRelationship}</p>
                   </div>
@@ -665,7 +677,7 @@ const Customers = () => {
                       formik.setFieldValue("countryCode", value || "")
                     }
                     value={formik.values.countryCode || undefined}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${
                       formik.touched.countryCode &&
                       formik.errors.countryCode
                         ? "border-red-600"
@@ -700,7 +712,7 @@ const Customers = () => {
                       formik.setFieldValue("countyCode", value || "")
                     }
                     value={formik.values.countyCode || undefined}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${formik.touched.countyCode && formik.errors.countyCode ? "border-red-600" : ""}`}/>
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${formik.touched.countyCode && formik.errors.countyCode ? "border-red-600" : ""}`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.countyCode && formik.errors.countyCode}</p>
                   </div>
@@ -729,7 +741,7 @@ const Customers = () => {
                       formik.setFieldValue("constituencyCode", value || "")
                     }
                     value={formik.values.constituencyCode || undefined}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${formik.touched.constituencyCode && formik.errors.constituencyCode ? "border-red-600" : ""}`}/>
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${formik.touched.constituencyCode && formik.errors.constituencyCode ? "border-red-600" : ""}`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.constituencyCode && formik.errors.constituencyCode}</p>
                   </div>
@@ -743,19 +755,17 @@ const Customers = () => {
                         .toLowerCase()
                         .includes(input.toLowerCase())
                     }
-                    options={
+                     options={
                       Array.isArray(wards)
-                        ? wards &&
-                          wards.map((ward) => ({
+                        && wards.map((ward) => ({
                             value: ward.wardCode,
                             label: ward.wardName,
                           }))
-                        : []
                     }
                     onBlur={formik.handleBlur}
                     onChange={(value) =>formik.setFieldValue("wardCode", value || "")}
                     value={formik.values.wardCode || undefined}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${formik.touched.wardCode && formik.errors.wardCode ? "border-red-600" : ""}`}/>
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${formik.touched.wardCode && formik.errors.wardCode ? "border-red-600" : ""}`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.wardCode && formik.errors.wardCode}</p>
                   </div>
@@ -783,7 +793,7 @@ const Customers = () => {
                     onBlur={formik.handleBlur}
                     onChange={(value) =>formik.setFieldValue("locationCode", value || "")}
                     value={formik.values.locationCode || undefined}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${formik.touched.locationCode && formik.errors.locationCode ? "border-red-600" : ""}`}/>
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${formik.touched.locationCode && formik.errors.locationCode ? "border-red-600" : ""}`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.locationCode && formik.errors.locationCode}</p>
                   </div>
@@ -810,7 +820,7 @@ const Customers = () => {
                     onBlur={formik.handleBlur}
                     onChange={(value) =>formik.setFieldValue("subLocationCode", value || "")}
                     value={formik.values.subLocationCode || undefined}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${formik.touched.subLocationCode && formik.errors.subLocationCode ? "border-red-600" : ""}`}/>
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${formik.touched.subLocationCode && formik.errors.subLocationCode ? "border-red-600" : ""}`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.subLocationCode && formik.errors.subLocationCode}</p>
                   </div>
@@ -838,19 +848,15 @@ const Customers = () => {
                     onBlur={formik.handleBlur}
                     onChange={(value) =>formik.setFieldValue("villageCode", value || "")}
                     value={formik.values.villageCode || undefined}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${formik.touched.villageCode && formik.errors.villageCode ? "border-red-600" : ""}`}/>
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${formik.touched.villageCode && formik.errors.villageCode ? "border-red-600" : ""}`}/>
                   <div>
                     <p className="text-xs text-red-600">{formik.touched.villageCode && formik.errors.villageCode}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between lg:justify-end gap-8 lg:gap-12 mt-4 ">
-                  <Button htmlType="button" onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingCustomer(null)}} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
-                  {updateLoading || registerLoading ? (
-                    <Button type="primary"  htmlType="button" loading className="w-28 text-sm font-semibold h-10 text-white font-sans">Please wait...</Button>
-                  ) : (
-                    <Button type="primary" htmlType="submit" disabled={registerLoading || updateLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans" >{editingCustomer ? "Update" : "Submit"}</Button>
-                  )}
+                     <Button htmlType="button" onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingCustomer(null)}} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+                     <Button type="primary" htmlType="submit" loading={ updateLoading || registerLoading} disabled={registerLoading || updateLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans" >{editingCustomer ? "Update" : "Submit"}</Button>
                 </div>
               </div>
             </div>
@@ -858,36 +864,21 @@ const Customers = () => {
         </form>
       </Modal>
 
-      
-      <div>
-        { allCustomerLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={<Loading3QuartersOutlined style={{fontSize: 40, color: "#000",}}spin/>}/>
-          </div>
-        ) : (
-          <div style={{ overflowX: "auto", width: "100%" }}>
-            <Table pagination columns={columns} dataSource={dataSource}scroll={{ x: "max-content" }}/>
-          </div>
-        )}
+      <div style={{ overflowX: "auto", width: "100%" }}>
+        <Table loading={allCustomerLoading} pagination columns={columns} dataSource={dataSource}scroll={{ x: "max-content" }}/>
       </div>
 
-
-        {/* delete user modal */}
-            <Modal title="Confirm customer deletion?" open={isDeleteModalOpen} footer={null} onCancel={handleDeleteModalCancel}>
-              <div>
-                <p className="text-sm">Are you sure you want to delete this customer? </p>
-              </div>
-              <div className="flex items-center justify-end  mt-6  gap-8">
-                <Button  htmlType="button" onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
-                {deleteACustomerLoading ? (
-                  <Button  type="primary"   htmlType="button"  loading className="w-28 text-sm font-semibold h-10 text-white font-sans">Please wait...</Button>
-                ) : (
-                  <Button onClick={deleteCustomer} type="primary" htmlType="button"  disabled={deleteACustomerLoading}  className="w-28 text-sm font-semibold h-10 text-white font-sans">Delete</Button>
-                )}
-              </div>
-            </Modal>
-    </div>
+     {/* delete user modal */}
+      <Modal title="Confirm customer deletion?" open={isDeleteModalOpen} footer={null} onCancel={handleDeleteModalCancel}>
+        <div>
+          <p className="text-sm">Are you sure you want to delete this customer? </p>
+        </div>
+        <div className="flex items-center justify-end  mt-6  gap-8">
+          <Button  htmlType="button" onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+          <Button loading={deleteACustomerLoading} onClick={deleteCustomer} type="primary" htmlType="button"  disabled={deleteACustomerLoading}  className="w-28 text-sm font-semibold h-10 text-white font-sans">Delete</Button>
+        </div>
+      </Modal>
+     </div>
   );
 };
 

@@ -1,12 +1,9 @@
-import { Button, Input, Modal, Select, Spin, Table, DatePicker } from "antd";
+import { Button, Input, Modal, Select,Table, DatePicker,Typography, Dropdown } from "antd";
 import { useFormik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
-import { Loading3QuartersOutlined } from "@ant-design/icons";
-import {addAPos,deleteAPos,getAllPoses,getAPos,resetPosState,updateAPos} from "../features/pos/posSlice";
+import {addAPos,addASignatory,deleteAPos,getAllPoses,getAPos,resetPosState,updateAPos} from "../features/pos/posSlice";
 import { getAllVillages } from "../features/village/villageSlice";
 import { getAllCampuses } from "../features/campus/campusSlice";
 import { getAllPosTypes } from "../features/posTypes/posTypeSlice";
@@ -14,72 +11,24 @@ import { getAllCounties } from "../features/county/countySlice";
 import { getAllConstituencies } from "../features/constituency/constituencySlice";
 import { getAllWards } from "../features/ward/wardSlice";
 import { getAllSubLocations } from "../features/subLocation/subLocationSlice";
+import { FaCheck } from "react-icons/fa6";
+import { IoEllipsisVertical } from "react-icons/io5";
+import { MdOutlineEdit } from "react-icons/md";
+import { IoDocumentTextOutline } from "react-icons/io5";
 import dayjs from "dayjs";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
-  {
-    title: "#",
-    dataIndex: "key",
-  },
-  {
-    title: "Group Name",
-    dataIndex: "groupName",
-  },
-  {
-    title: "Description",
-    dataIndex: "posDescription",
-  },
-  {
-    title: "Mobile Number",
-    dataIndex: "mobileNumber",
-  },
-  {
-    title: "Date Of Registration",
-    dataIndex: "dateOfRegistration",
-  },
-   {
-    title: "Physical Address",
-    dataIndex: "physicalAddress",
-  },
-     {
-    title: "Number Of Members",
-    dataIndex: "numberOfMembers",
-  },
-  {
-    title: "posStatus",
-    dataIndex: "posStatus",
-  },
-  {
-    title: "Action",
-    dataIndex: "action",
-  },
+  { title: "#", dataIndex: "key",},
+  { title: "Group Name",dataIndex: "groupName",},
+  { title: "Description", dataIndex: "posDescription",},
+  { title: "Mobile Number",dataIndex: "mobileNumber",},
+  { title: "Date Of Registration", dataIndex: "dateOfRegistration",},
+  { title: "Physical Address", dataIndex: "physicalAddress",},
+  { title: "Number Of Members",dataIndex: "numberOfMembers",},
+  { title: "Status",dataIndex: "posStatus",},
+  { title: "Action",dataIndex: "action",},
 ];
-
-
-// {
-//   "posTypeCode": 0,
-//   "posName": "string",
-//   "posDescription": "string",
-//   "posVillageCode": 0,
-//   "posCampusCode": 0,
-//   "posStatus": "ACTIVE",
-//   "groupName": "string",
-//   "mobileNumber": "string",
-//   "emailAddress": "string",
-//   "dateOfRegistration": "2025-05-25",
-//   "physicalAddress": "string",
-//   "signingOptions": "string",
-//   "otherInstructions": "string",
-//   "numberOfMembers": "string",
-//   "refereeFullName": "string",
-//   "refereeMemberNumber": "string",
-//   "county": "string",
-//   "subCounty": "string",
-//   "ward": "string",
-//   "subLocation": "string",
-//   "villageEstate": "string"
-// }
-
 
 const phoneNumberRegex = /^(\+?[1-9]\d{1,14}|0\d{1,14})$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -95,10 +44,10 @@ const POS_SCHEMA = Yup.object().shape({
   posStatus:Yup.string().oneOf(["ACTIVE","INACTIVE"]).required("Please select point of sale status."),
   groupName:Yup.string().required("Please provide group name."),
   mobileNumber:Yup.string().matches(phoneNumberRegex,"Please provide a valid phone number.").required("Please provide group phone number."),
-  emailAddress:Yup.string().email("Please provide a valid email").matches(emailRegex, "Please provide a valid email.").required("Please provide group email address."),
-  dateOfRegistration: Yup.date().required("Select group registration date.").min(dayjs().subtract(1, 'day').toDate(), "Date cannot be in the past."),
+  email:Yup.string().email("Please provide a valid email").matches(emailRegex, "Please provide a valid email.").required("Please provide group email address."),
+  dateOfRegistration: Yup.date().required("Select group registration date."),
   physicalAddress:Yup.string().required("Please provide a physical address."),
-  signingOptions:Yup.string().required("Please provide a sign in options."),
+  signingOptions:Yup.string().required("Select preffered signing option."),
   otherInstructions:Yup.string(),
   numberOfMembers:Yup.number().required("Please provide number of members of the group."),
   refereeFullName: Yup.string(),
@@ -110,6 +59,13 @@ const POS_SCHEMA = Yup.object().shape({
   villageEstate:Yup.string().required("select Village."),
 });
 
+const SIGNATORIES_SCHEMA  = Yup.object().shape({
+  fullName: Yup.string().required("Please provide full name."),
+  idNumber: Yup.string().required("Please provide id number."),
+  nationality: Yup.string().required("Please select nationality."),
+  designation: Yup.string().required("Please provide designation.")
+})
+
 const Pos = () => {
   const dispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -118,14 +74,11 @@ const Pos = () => {
   const [selectedPosCode, setSelectedPosCode] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingPos, setEditingPos] = useState(false);
-
   const getAllPosLoading = useSelector((state) => state?.pos?.loading?.getAllPoses);
   const poses = useSelector((state) => state?.pos?.poses);
-
   const addAPosLoading = useSelector((state) => state?.pos?.loading?.addAPos);
-  const updateAPosLoading = useSelector((state) => state?.posType?.loading?.updateAPos);
+  const updateAPosLoading = useSelector((state) => state?.pos?.loading?.updateAPos);
   const deleteAPosLoading = useSelector((state) => state?.pos?.loading?.deleteAPos);
-
   const addAPosSuccess = useSelector((state) => state?.pos?.success?.addAPos);
   const updateAPosSuccess = useSelector((state) => state?.pos?.success?.updateAPos);
   const deleteAPosSuccess = useSelector((state) => state?.pos?.success?.deleteAPos);
@@ -136,6 +89,8 @@ const Pos = () => {
   const constituencies = useSelector((state) => state?.constituency?.constituencies);
   const wards = useSelector((state)=>state?.ward?.wards)
   const subLocations = useSelector((state) => state?.subLocation?.subLocations);
+  const addASignatoryLoading = useSelector((state)=>state?.pos?.loading?.addASignatory)
+  const addASignatorySuccess = useSelector((state)=>state?.pos?.success?.addASignatory)
     
   const showModal = useCallback(() => {
     setIsModalOpen(true);
@@ -159,7 +114,8 @@ const Pos = () => {
     }
 
     const handleCloseSignatoriesModal = ()=>{
-       setOpenSignatoriesModal(true)
+       setOpenSignatoriesModal(false)
+       signatoriesFormik.resetForm()
     }
 
   const showEditModal = async (pos) => {
@@ -178,7 +134,7 @@ const Pos = () => {
       posStatus:editingPos?.posStatus || null,
       groupName: editingPos?.groupName || "",
       mobileNumber: editingPos?.mobileNumber || "",
-      emailAddress: editingPos?.emailAddress || "",
+      email: editingPos?.email || "",
       dateOfRegistration: editingPos?.dateOfRegistration || null,
       physicalAddress: editingPos?.physicalAddress || null,
       signingOptions: editingPos?.signingOptions || null,
@@ -192,14 +148,11 @@ const Pos = () => {
       subLocation: editingPos?.subLocation || null,
       villageEstate:editingPos?.villageEstate || null,
     },
-
     enableReinitialize: true,
     validationSchema: POS_SCHEMA,
     onSubmit: (values) => {
       if (editingPos) {
-        dispatch(
-          updateAPos({ posCode: editingPos?.posCode, posData: values,})
-        );
+        dispatch(updateAPos({ posCode: editingPos?.posCode, posData: values,}));
       } else {
         dispatch(addAPos(values));
       }
@@ -226,52 +179,105 @@ const Pos = () => {
   useEffect(() => {
     if (addAPosSuccess) {
       formik.resetForm();
-      setIsModalOpen(false);
+      dispatch(resetPosState())
       dispatch(getAllPoses())
+      setIsModalOpen(false);
+      dispatch(getAllPosTypes());
+      dispatch(getAllVillages());
+      dispatch(getAllCampuses());
+      dispatch(getAllCounties());
+      dispatch(getAllConstituencies());
+      dispatch(getAllWards());
+      dispatch(getAllSubLocations());
+      dispatch(getAllVillages());
     }
-  }, [addAPosSuccess]);
+  }, [addAPosSuccess,dispatch]);
 
   useEffect(() => {
     if (updateAPosSuccess) {
       formik.resetForm();
-      setIsEditModalOpen(false);
+      dispatch(resetPosState())
       setEditingPos(null);
       dispatch(getAllPoses());
+      setIsEditModalOpen(false);
+      dispatch(getAllPoses());
+      dispatch(getAllPosTypes());
+      dispatch(getAllVillages());
+      dispatch(getAllCampuses());
+      dispatch(getAllCounties());
+      dispatch(getAllConstituencies());
+      dispatch(getAllWards());
+      dispatch(getAllSubLocations());
+      dispatch(getAllVillages());
     }
-  }, [updateAPosSuccess]);
+  }, [updateAPosSuccess,dispatch]);
 
 
-  const dataSource =
-    poses && Array.isArray(poses)
-      ? poses.map((pos, index) => ({
+
+
+
+ // Move the items array inside the dataSource mapping
+const dataSource =
+  poses && Array.isArray(poses)
+    ? poses.map((pos, index) => {
+        const items = [
+          {
+            key: '1',
+            label: (
+              <div type="button" onClick={()=>{handleOpenSignatoriesModal(); setSelectedPosCode(pos?.posCode) }} style={{ display: "flex", gap: "10px" }}>
+                <FaCheck style={{ width: "20px", height: "20px" }} className="text-green-600 font-medium text-xl" />
+                <Typography style={{ fontSize: "14px", fontWeight: "400", textAlign: "start" }}>Add Signatories</Typography>
+              </div>
+            ),
+          },
+          {
+            key: "2",
+            label: (
+              <div style={{ display: "flex", gap: "10px" }}>
+                <IoDocumentTextOutline style={{ width: "20px", height: "20px" }} className="text-grey-600 font-medium text-xl" />
+                <Typography style={{ fontSize: "14px", fontWeight: "400", textAlign: "start" }}>Upload Documents</Typography>
+              </div>
+            ),
+          },
+          {
+            key: '3',
+            label: (
+              <div onClick={() => showEditModal(pos)} style={{ display: "flex", gap: "10px" }}>
+                <MdOutlineEdit style={{ width: "20px", height: "20px" }} className="text-blue-600 font-medium text-xl" />
+                <Typography style={{ fontSize: "14px", fontWeight: "400", textAlign: "start" }}>Edit Group</Typography>
+              </div>
+            ),
+          },
+          {
+            key: '4',
+            label: (
+              <div onClick={() => {setSelectedPosCode(pos?.posCode); showDeleteModal(); }} style={{ display: "flex", gap: "10px" }}>
+                <RiDeleteBinLine style={{ width: "20px", height: "20px" }} className="text-red-600 font-medium text-xl" />
+                <Typography style={{ fontSize: "14px", fontWeight: "400", textAlign: "start" }}>Delete Group</Typography>
+              </div>
+            ),
+          },
+        ];
+
+        return {
           key: index + 1,
           groupName: pos?.groupName,
-          mobileNumber:pos?.mobileNumber,
+          mobileNumber: pos?.mobileNumber,
           posDescription: pos?.posDescription,
           dateOfRegistration: pos?.dateOfRegistration,
           physicalAddress: pos?.physicalAddress,
-          numberOfMembers:pos?.numberOfMembers,
+          numberOfMembers: pos?.numberOfMembers,
           posStatus: pos?.posStatus,
           action: (
-            <>
-              <div className="flex flex-row items-center gap-8 ">
-                <button type="button" onClick={() => showEditModal(pos)}>
-                  <FaEdit className="text-blue-600 font-medium text-xl" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedPosCode(pos?.posCode);
-                    showDeleteModal();
-                  }}
-                >
-                  <MdDelete className="text-red-600  font-medium  text-xl" />
-                </button>
+            <Dropdown menu={{ items }} trigger={['click']}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", cursor: 'pointer' }}>
+                <IoEllipsisVertical style={{ fontSize: "28px", height: "24px", width: "24px" }} />
               </div>
-            </>
+            </Dropdown>
           ),
-        }))
-      : [];
+        };
+      })
+    : [];
 
   const deletePos = async () => {
     if (selectedPosCode) {
@@ -283,15 +289,56 @@ const Pos = () => {
     if (deleteAPosSuccess) {
       setIsDeleteModalOpen(false);
       setSelectedPosCode(null);
-      dispatch(resetPosState())
+      dispatch(resetPosState());
       dispatch(getAllPoses());
+      dispatch(getAllPosTypes());
+      dispatch(getAllVillages());
+      dispatch(getAllCampuses());
+      dispatch(getAllCounties());
+      dispatch(getAllConstituencies());
+      dispatch(getAllWards());
+      dispatch(getAllSubLocations());
+      dispatch(getAllVillages());
     }
   }, [deleteAPosSuccess]);
   
    const signingOptions = [
-    {id:1, name:"Email & Password"},
-    { id:2, name:"Group Number & Password"}
+    {id:1, name:"Singly"},
+    { id:2, name:"Jointly"}
    ]
+
+    const signatoriesFormik = useFormik({
+      initialValues:{
+        fullName:"",
+        idNumber:"",
+        nationality:"", 
+        designation:"",
+      },
+      validationSchema: SIGNATORIES_SCHEMA,
+      onSubmit:(values)=>{
+       if(selectedPosCode){
+        dispatch(addASignatory({ posCode:selectedPosCode,  signatoryData:values}))
+       }
+      }
+    })
+
+    useEffect(()=>{
+      if(addASignatorySuccess){
+        signatoriesFormik.resetForm();
+        handleCloseSignatoriesModal()
+        dispatch(resetPosState());
+        dispatch(getAllPoses());
+        dispatch(getAllPosTypes());
+        dispatch(getAllVillages());
+        dispatch(getAllCampuses());
+        dispatch(getAllCounties());
+        dispatch(getAllConstituencies());
+        dispatch(getAllWards());
+        dispatch(getAllSubLocations());
+        dispatch(getAllVillages());
+      }
+    },[addASignatorySuccess, dispatch])
+
   return (
     <div className="font-sans">
       <div className="flex justify-between items-center mb-2">
@@ -302,35 +349,20 @@ const Pos = () => {
       </div>
 
       <div className="mb-4">
-        <Input  style={{ width:"400px", height:"40px"}} placeholder="Search..." />
+        <Input style={{ width:"400px", height:"40px"}} placeholder="Search..." />
       </div>
 
       <Modal
-        title={
-          <div>
-            <h2 className="text-xl font-semibold">
-              {editingPos ? "Edit group" : "Add a new group"}
-            </h2>
-          </div>
-        }
-        open={isModalOpen || isEditModalOpen}
-        footer={null}
-        onCancel={() => {
-          handleCancel();
-          setIsEditModalOpen(false);
-          setEditingPos(null);
-        }}
+        title={<h2 className="text-xl font-semibold">{editingPos ? "Update group details" : "Add a New Group"}</h2>}
+        open={isModalOpen || isEditModalOpen} footer={null} onCancel={() => {handleCancel(); setIsEditModalOpen(false); setEditingPos(null);}}
         width={1032}
-        className="font-sans"
       >
         <form className="pb-4 font-sans" onSubmit={formik.handleSubmit}>
           <div className="flex flex-col items-center gap-8">
             <div className="flex items-center flex-col gap-3  mt-4">
               <div className="flex justify-start lg:gap-8">
-
                 <div className="flex gap-4"> 
-
-                <div className="flex flex-col gap-3">
+                 <div className="flex flex-col gap-3">
                   <div className="flex flex-col gap-1">
                     <label htmlFor="posName" className="text-sm font-semibold">Point of Sale Name </label>
                     <Input type="text" id="posName" name="posName"
@@ -351,11 +383,7 @@ const Pos = () => {
                       }}
                       onChange={formik.handleChange}
                       value={formik.values.posName}
-                      className={`w-80 h-11 border-1.5 ${
-                        formik.touched.posName && formik.errors.posName
-                          ? "border-red-600"
-                          : ""
-                      }`}
+                      className={`w-80 h-11 ${ formik.touched.posName && formik.errors.posName ? "border-red-600" : "" }`}
                     />
                     <div>
                       <p className="text-xs text-red-600">
@@ -363,8 +391,6 @@ const Pos = () => {
                       </p>
                     </div>
                   </div>
-
-
 
                   <div className="flex flex-col gap-1">
                     <label htmlFor="posDescription" className="text-sm font-semibold">
@@ -385,17 +411,11 @@ const Pos = () => {
                       }}
                       onChange={formik.handleChange}
                       value={formik.values.posDescription}
-                      className={`w-80 h-11 border-1.5 ${
-                        formik.touched.posDescription &&
-                        formik.errors.posDescription
-                          ? "border-red-600"
-                          : ""
-                      }`}
+                      className={`w-80 h-11 ${ formik.touched.posDescription && formik.errors.posDescription ? "border-red-600" : "" }`}
                     />
                     <div>
                       <p className="text-xs text-red-600">
-                        {formik.touched.posDescription &&
-                          formik.errors.posDescription}
+                        {formik.touched.posDescription && formik.errors.posDescription}
                       </p>
                     </div>
                   </div>
@@ -431,28 +451,16 @@ const Pos = () => {
                         formik.setFieldValue("posTypeCode", value)
                       }
                       value={formik.values.posTypeCode}
-                      className={`w-80 h-11 border-1.5 rounded-lg ${
-                        formik.touched.posTypeCode && formik.errors.posTypeCode
-                          ? "border-red-600"
-                          : ""
-                      }`}
+                      className={`w-80 h-11 ${ formik.touched.posTypeCode && formik.errors.posTypeCode ? "border-red-600" : "" }`}
                     />
                     <div>
-                      <p className="text-xs text-red-600">
-                        {formik.touched.posTypeCode &&
-                          formik.errors.posTypeCode}
-                      </p>
+                      <p className="text-xs text-red-600"> {formik.touched.posTypeCode && formik.errors.posTypeCode} </p>
                     </div>
                   </div>
 
 
                   <div className="flex flex-col gap-1">
-                    <label
-                      htmlFor="posVillageCode"
-                      className="text-sm font-semibold"
-                    >
-                      Point of Sale Village 
-                    </label>
+                    <label htmlFor="posVillageCode" className="text-sm font-semibold" > Point of Sale Village </label>
                     <Select
                       placeholder="Select Point of Sale Village."
                       type="text"
@@ -477,18 +485,9 @@ const Pos = () => {
                         formik.setFieldValue("posVillageCode", value)
                       }
                       value={formik.values.posVillageCode}
-                      className={`w-80 h-11 border-1.5 rounded-lg ${
-                        formik.touched.posVillageCode &&
-                        formik.errors.posVillageCode
-                          ? "border-red-600"
-                          : ""
-                      }`}
-                    />
+                      className={`w-80 h-11 ${ formik.touched.posVillageCode && formik.errors.posVillageCode ? "border-red-600" : "" }`} />
                     <div>
-                      <p className="text-xs text-red-600">
-                        {formik.touched.posVillageCode &&
-                          formik.errors.posVillageCode}
-                      </p>
+                      <p className="text-xs text-red-600"> {formik.touched.posVillageCode && formik.errors.posVillageCode} </p>
                     </div>
                   </div>
 
@@ -514,7 +513,7 @@ const Pos = () => {
                         formik.setFieldValue("posCampusCode", value)
                       }
                       value={formik.values.posCampusCode}
-                      className={`w-80 h-11 border-1.5 rounded-lg ${
+                      className={`w-80 h-11  ${
                         formik.touched.posCampusCode &&
                         formik.errors.posCampusCode
                           ? "border-red-600"
@@ -523,16 +522,14 @@ const Pos = () => {
                     />
                     <div>
                       <p className="text-xs text-red-600">
-                        {formik.touched.posCampusCode &&
-                          formik.errors.posCampusCode}
+                        {formik.touched.posCampusCode && formik.errors.posCampusCode}
                       </p>
                     </div>
                   </div>
 
                    <div className="flex flex-col gap-1">
                     <label htmlFor="groupName" className="text-sm font-semibold">Group Name</label>
-                    <Input type="text" id="groupName" name="groupName"
-                      placeholder="e.g. Wagai Self Help Group"
+                    <Input type="text" id="groupName" name="groupName" placeholder="e.g. Wagai Self Help Group"
                       onBlur={(e) => {
                         formik.setFieldValue(
                           "groupName",
@@ -549,11 +546,7 @@ const Pos = () => {
                       }}
                       onChange={formik.handleChange}
                       value={formik.values.groupName}
-                      className={`w-80 h-11 border-1.5 ${
-                        formik.touched.groupName && formik.errors.groupName
-                          ? "border-red-600"
-                          : ""
-                      }`}
+                      className={`w-80 h-11 ${ formik.touched.groupName && formik.errors.groupName ? "border-red-600" : "" }`}
                     />
                     <div>
                       <p className="text-xs text-red-600">
@@ -568,7 +561,7 @@ const Pos = () => {
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
                         value={formik.values.mobileNumber}
-                        className={`w-80 h-11 border-1.5 ${
+                        className={`w-80 h-11 ${
                           formik.touched.mobileNumber && formik.errors.mobileNumber
                             ? "border-red-600"
                             : ""
@@ -582,25 +575,23 @@ const Pos = () => {
                   </div>
 
                 </div>
-
-
-                 <div className="flex flex-col gap-3">
+             <div className="flex flex-col gap-3">
                   
                <div className="flex flex-col gap-1">
-                  <label htmlFor="emailAddress" className="text-sm font-semibold"> Email Address </label>
-                  <Input type="email" name="emailAddress" id="emailAddress" placeholder="e.g. example@gmail.com" 
+                  <label htmlFor="email" className="text-sm font-semibold"> Email Address </label>
+                  <Input type="email" name="email" id="email" placeholder="e.g. example@gmail.com" 
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    value={formik.values.emailAddress}
-                    className={`w-80 h-11 border-1.5 ${
-                      formik.touched.emailAddress && formik.errors.emailAddress
+                    value={formik.values.email}
+                    className={`w-80 h-11  ${
+                      formik.touched.email && formik.errors.email
                         ? "border-red-600"
                         : ""
                     }`}
                   />
                   <div>
                     <p className="text-xs text-red-600">
-                      {formik.touched.emailAddress && formik.errors.emailAddress}
+                      {formik.touched.email && formik.errors.email}
                     </p>
                   </div>
                 </div>
@@ -618,7 +609,7 @@ const Pos = () => {
                       }}
                       onChange={formik.handleChange}
                       value={formik.values.physicalAddress}
-                      className={`w-80 h-11 border-1.5 ${
+                      className={`w-80 h-11 ${
                         formik.touched.physicalAddress &&
                         formik.errors.physicalAddress
                           ? "border-red-600"
@@ -633,7 +624,7 @@ const Pos = () => {
                   <div className="flex flex-col gap-1">
                     <label htmlFor="dateOfRegistration" className="text-sm font-semibold">Date Of Registration</label>
                        <DatePicker id="dateOfRegistration" name="dateOfRegistration" placeholder="Select Registration Date"
-                          className={`w-80 h-11 border-1.5 ${
+                          className={`w-80 h-11  ${
                             formik.touched.dateOfRegistration && formik.errors.dateOfRegistration
                               ? "border-red-600"
                               : ""
@@ -669,7 +660,7 @@ const Pos = () => {
                         formik.setFieldValue("signingOptions", value)
                       }
                       value={formik.values.signingOptions}
-                      className={`w-80 h-11 border-1.5 rounded-lg ${formik.touched.signingOptions && formik.errors.signingOptions
+                      className={`w-80 h-11 ${formik.touched.signingOptions && formik.errors.signingOptions
                           ? "border-red-600"
                           : ""
                       }`}
@@ -692,7 +683,7 @@ const Pos = () => {
                       }}
                       onChange={formik.handleChange}
                       value={formik.values.otherInstructions}
-                      className={`w-80 h-11 border-1.5 ${
+                      className={`w-80 h-11 ${
                         formik.touched.otherInstructions &&
                         formik.errors.otherInstructions
                           ? "border-red-600"
@@ -710,7 +701,7 @@ const Pos = () => {
                         onBlur={formik.handleBlur}
                         onChange={formik.handleChange}
                         value={formik.values.numberOfMembers}
-                        className={`w-80 h-11 border-1.5 ${
+                        className={`w-80 h-11 ${
                           formik.touched.numberOfMembers && formik.errors.numberOfMembers
                             ? "border-red-600"
                             : ""
@@ -738,7 +729,7 @@ const Pos = () => {
                       }}
                       onChange={formik.handleChange}
                       value={formik.values.refereeFullName}
-                      className={`w-80 h-11 border-1.5 ${
+                      className={`w-80 h-11 ${
                         formik.touched.refereeFullName &&
                         formik.errors.refereeFullName
                           ? "border-red-600"
@@ -755,7 +746,7 @@ const Pos = () => {
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-col gap-1">
                     <label htmlFor="refereeMemberNumber" className="text-sm font-semibold">Referee Member Number</label>
-                    <Input placeholder="Referee Member Number" type="number" name="refereeMemberNumber" id="refereeMemberNumber"
+                    <Input placeholder="Referee Member Number" type="text" name="refereeMemberNumber" id="refereeMemberNumber"
                       onBlur={(e) => {
                         formik.setFieldValue(
                           "refereeMemberNumber",
@@ -766,7 +757,7 @@ const Pos = () => {
                       }}
                       onChange={formik.handleChange}
                       value={formik.values.refereeMemberNumber}
-                      className={`w-80 h-11 border-1.5 ${
+                      className={`w-80 h-11 ${
                         formik.touched.refereeMemberNumber &&
                         formik.errors.refereeMemberNumber
                           ? "border-red-600"
@@ -800,7 +791,7 @@ const Pos = () => {
                         formik.setFieldValue("county", value)
                       }
                       value={formik.values.county}
-                      className={`w-80 h-11 border-1.5 rounded-lg ${
+                      className={`w-80 h-11  ${
                         formik.touched.county && formik.errors.county
                           ? "border-red-600"
                           : ""
@@ -834,7 +825,7 @@ const Pos = () => {
                         formik.setFieldValue("subCounty", value)
                       }
                       value={formik.values.subCounty}
-                      className={`w-80 h-11 border-1.5 rounded-lg ${
+                      className={`w-80 h-11 ${
                         formik.touched.subCounty && formik.errors.subCounty
                           ? "border-red-600"
                           : ""
@@ -867,11 +858,7 @@ const Pos = () => {
                         formik.setFieldValue("ward", value)
                       }
                       value={formik.values.ward}
-                      className={`w-80 h-11 border-1.5 rounded-lg ${
-                        formik.touched.ward && formik.errors.ward
-                          ? "border-red-600"
-                          : ""
-                      }`}
+                      className={`w-80 h-11 ${ formik.touched.ward && formik.errors.ward ? "border-red-600" : "" }`}
                     />
                     <div>
                       <p className="text-xs text-red-600"> {formik.touched.ward && formik.errors.ward}</p>
@@ -900,11 +887,7 @@ const Pos = () => {
                         formik.setFieldValue("subLocation", value)
                       }
                       value={formik.values.subLocation}
-                      className={`w-80 h-11 border-1.5 rounded-lg ${
-                        formik.touched.subLocation && formik.errors.subLocation
-                          ? "border-red-600"
-                          : ""
-                      }`}
+                      className={`w-80 h-11 ${ formik.touched.subLocation && formik.errors.subLocation ? "border-red-600" : "" }`}
                     />
                     <div>
                       <p className="text-xs text-red-600"> {formik.touched.subLocation && formik.errors.subLocation}</p>
@@ -934,11 +917,7 @@ const Pos = () => {
                         formik.setFieldValue("villageEstate", value)
                       }
                       value={formik.values.villageEstate}
-                      className={`w-80 h-11 border-1.5 rounded-lg ${
-                        formik.touched.villageEstate && formik.errors.villageEstate
-                          ? "border-red-600"
-                          : ""
-                      }`}
+                      className={`w-80 h-11 ${ formik.touched.villageEstate && formik.errors.villageEstate ? "border-red-600" : "" }`}
                     />
                     <div>
                       <p className="text-xs text-red-600"> {formik.touched.villageEstate && formik.errors.villageEstate}</p>
@@ -966,19 +945,15 @@ const Pos = () => {
                             onBlur={formik.handleBlur}
                             onChange={(value) => formik.setFieldValue("posStatus", value)}
                             value={formik.values.posStatus}
-                            className={`w-80 h-11 border-1.5 rounded-lg ${formik.touched.posStatus && formik.errors.posStatus ? "border-red-600": "" }`}/>
+                            className={`w-80 h-11 ${formik.touched.posStatus && formik.errors.posStatus ? "border-red-600": "" }`}/>
                              <div>
                                <p className="text-xs text-red-600">{formik.touched.posStatus && formik.errors.posStatus}</p>
                             </div>       
                       </div>
 
                   <div className="flex items-center justify-between  mt-4 ">
-                    <Button onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingPos(null);}} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
-                    {addAPosLoading || updateAPosLoading ? (
-                      <Button type="primary" htmlType="button"  loading  className="w-28 text-sm font-semibold h-10 text-white font-sans"> Please wait... </Button>
-                    ) : (
-                      <Button type="primary" htmlType="submit" disabled={addAPosLoading || updateAPosLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans" > {editingPos ? "Update" : "Continue"}</Button>
-                    )}
+                      <Button onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingPos(null);}} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+                      <Button type="primary" htmlType="submit" loading={ addAPosLoading || updateAPosLoading} disabled={addAPosLoading || updateAPosLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans" > {editingPos ? "Update" : "Continue"}</Button>
                   </div>
                 </div>
               </div>
@@ -987,45 +962,138 @@ const Pos = () => {
             </div>
           </div>
         </form>
+
       </Modal>
 
-      <div>
-        {getAllPosLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined
-                  style={{
-                    fontSize: 40,
-                    color: "#000",
-                  }}
-                  spin
-                />
-              }
-            />
-          </div>
-        ) : (
-          <div style={{ overflowX: "auto", width: "100%" }}>
-            <Table  columns={columns} dataSource={dataSource} scroll={{ x: "max-content" }}/>
-          </div>
-        )}
-      </div>
-
+        <div style={{ overflowX: "auto", width: "100%" }}>
+          <Table  loading={getAllPosLoading} columns={columns} dataSource={dataSource} scroll={{ x: "max-content" }}/>
+        </div>
+  
       {/* delete pos  modal */}
-      <Modal  title="Confirm group deletion?" open={isDeleteModalOpen} footer={null} onCancel={handleDeleteModalCancel}>
+
+      <Modal title="Confirm group deletion?" open={isDeleteModalOpen} footer={null} onCancel={handleDeleteModalCancel}>
         <div>
           <p className="text-sm">Are you sure you want to delete this group? </p>
         </div>
-
         <div className="flex items-center justify-end  mt-6  gap-8">
           <Button htmlType="button" onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
-          {deleteAPosLoading ? (
-            <Button  type="primary" htmlType="button"  loading   className="w-28 text-sm font-semibold h-10 text-white font-sans">Please wait...</Button>
-          ) : (
-            <Button onClick={deletePos} type="primary" htmlType="button" disabled={deleteAPosLoading}  className="w-28 text-sm font-semibold h-10 text-white font-sans">Delete</Button>
-          )}
+          <Button onClick={deletePos} type="primary" loading={deleteAPosLoading} htmlType="button" disabled={deleteAPosLoading}  className="w-28 text-sm font-semibold h-10 text-white font-sans">Delete</Button>
         </div>
       </Modal>
+
+
+      <Modal width={368} open={openSignatoriesModal} footer={null} onCancel={handleCloseSignatoriesModal}
+       title={(<Typography style={{ fontSize:"18px", fontWeight:"600", textAlign:"start", color:"#333"}}>Add Signatories to this Group</Typography>)}>
+      <form onSubmit={signatoriesFormik.handleSubmit}  >
+        <div style={{ display:"flex", flexDirection:"column", gap:"10px"}}>
+            <div className="flex flex-col gap-1">
+                    <label htmlFor="fullName" className="text-sm font-semibold">Full Name</label>
+                    <Input type="text" id="fullName" name="fullName"
+                      placeholder="Full Name"
+                      onBlur={(e) => {
+                        signatoriesFormik.setFieldValue(
+                          "fullName",
+                          e.target.value
+                            .toLowerCase()
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ")
+                        );
+                        signatoriesFormik.handleBlur(e);
+                      }}
+                      onChange={signatoriesFormik.handleChange}
+                      value={signatoriesFormik.values.fullName}
+                      className={`w-80 h-11 ${ signatoriesFormik.touched.fullName && signatoriesFormik.errors.fullName ? "border-red-600" : "" }`}
+                    />
+                <div>
+                  <p className="text-xs text-red-600">
+                    {signatoriesFormik.touched.fullName && signatoriesFormik.errors.fullName}
+                  </p>
+                </div>
+             </div>
+
+              <div className="flex flex-col gap-1">
+                    <label htmlFor="idNumber" className="text-sm font-semibold">Id Number</label>
+                    <Input type="text" id="idNumber" name="idNumber"
+                      placeholder="National Id"
+                      onBlur={signatoriesFormik.handleBlur}
+                      onChange={signatoriesFormik.handleChange}
+                      value={signatoriesFormik.values.idNumber}
+                      className={`w-80 h-11 ${ signatoriesFormik.touched.idNumber && signatoriesFormik.errors.idNumber ? "border-red-600" : "" }`}
+                    />
+                <div>
+                  <p className="text-xs text-red-600">
+                    {signatoriesFormik.touched.idNumber && signatoriesFormik.errors.idNumber}
+                  </p>
+                </div>
+             </div>
+
+              <div className="flex flex-col gap-1">
+                    <label htmlFor="nationality" className="text-sm font-semibold">Nationality</label>
+                    <Input type="text" id="nationality" name="nationality"
+                      placeholder="Provide Nationality"
+                      onBlur={(e) => {
+                        signatoriesFormik.setFieldValue("nationality",e.target.value.toLowerCase() 
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ")
+                        );
+                        signatoriesFormik.handleBlur(e);
+                      }}
+                      onChange={signatoriesFormik.handleChange}
+                      value={signatoriesFormik.values.nationality}
+                      className={`w-80 h-11 ${ signatoriesFormik.touched.nationality && signatoriesFormik.errors.nationality ? "border-red-600" : "" }`}
+                    />
+                <div>
+                  <p className="text-xs text-red-600">
+                    {signatoriesFormik.touched.nationality && signatoriesFormik.errors.nationality}
+                  </p>
+                </div>
+             </div>
+
+              <div className="flex flex-col gap-1">
+                    <label htmlFor="designation" className="text-sm font-semibold">Designation</label>
+                    <Input type="text" id="designation" name="designation"
+                      placeholder="Provide Designation"
+                      onBlur={(e) => {
+                        signatoriesFormik.setFieldValue(
+                          "designation",
+                          e.target.value
+                            .toLowerCase()
+                            .split(" ")
+                            .map(
+                              (word) =>
+                                word.charAt(0).toUpperCase() + word.slice(1)
+                            )
+                            .join(" ")
+                        );
+                        signatoriesFormik.handleBlur(e);
+                      }}
+                      onChange={signatoriesFormik.handleChange}
+                      value={signatoriesFormik.values.designation}
+                      className={`w-80 h-11 ${ signatoriesFormik.touched.designation && signatoriesFormik.errors.designation ? "border-red-600" : "" }`}
+                    />
+                <div>
+                  <p className="text-xs text-red-600">
+                    {signatoriesFormik.touched.designation && signatoriesFormik.errors.designation}
+                  </p>
+                </div>
+             </div>
+
+            <div style={{ marginTop:"10px"}} className="flex items-center justify-between gap-8">
+              <Button htmlType="button" onClick={handleCloseSignatoriesModal} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+              <Button loading={addASignatoryLoading} type="primary" htmlType="submit" className="w-28 text-sm font-semibold h-10 text-white font-sans">Submit</Button>
+            </div>
+        </div>
+      </form>
+      </Modal>
+
     </div>
   );
 };

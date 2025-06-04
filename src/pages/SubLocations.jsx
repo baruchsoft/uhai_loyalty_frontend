@@ -9,9 +9,9 @@ import { getAllCountries } from "../features/country/countrySlice";
 import { getAllCounties } from "../features/county/countySlice";
 import { getAllConstituencies } from "../features/constituency/constituencySlice";
 import { useDispatch, useSelector } from "react-redux";
-import { MdDelete } from "react-icons/md";
-import { FaEdit } from "react-icons/fa";
+import { MdDelete, MdOutlineEdit } from "react-icons/md";
 import { getAllLocations } from "../features/location/locationSlice";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
   {
@@ -220,10 +220,10 @@ const SubLocations = () => {
             <>
               <div className="flex flex-row items-center gap-8 ">
                 <button  type="button"  onClick={() => showEditModal(subLocation)}  >
-                  <FaEdit className="text-blue-600 font-medium text-xl" />
+                  <MdOutlineEdit className="text-blue-600 font-medium text-xl" />
                 </button>
                 <button type="button"  onClick={() => {   setSelectedSubLocationCode(subLocation.subLocationCode);   showDeleteModal(); }} >
-                  <MdDelete className="text-red-600  font-medium  text-xl" />
+                  <RiDeleteBinLine className="text-red-600  font-medium  text-xl" />
                 </button>
               </div>
             </>
@@ -529,17 +529,11 @@ const SubLocations = () => {
                     </div>
                   </div>
 
-
-
                   <div className="flex items-center justify-between  mt-4 ">
-                    <Button onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingSubLocation(null);}}className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
-                    {addASubLocationLoading || updateASubLocationLoading ? (
-                      <Button type="primary" htmlType="button" loading className="w-28 text-sm font-semibold h-10 text-white font-sans"> Please wait...</Button>
-                    ) : (
-                      <Button type="primary" htmlType="submit" disabled={addASubLocationLoading || updateASubLocationLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans">
+                     <Button onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingSubLocation(null);}}className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+                      <Button type="primary" htmlType="submit" loading={addASubLocationLoading || updateASubLocationLoading } disabled={addASubLocationLoading || updateASubLocationLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans">
                         {editingSubLocation ? "Update" : "Submit"}
                       </Button>
-                    )}
                   </div>
 
               </div>
@@ -550,31 +544,16 @@ const SubLocations = () => {
         </form>
       </Modal>
 
-      <div>
-        {getAllSubLocationsLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined
-                  style={{
-                    fontSize: 40,
-                    color: "#000",
-                  }}
-                  spin
-                />
-              }
-            />
-          </div>
-        ) : (
+      
           <div style={{ overflowX: "auto", width: "100%" }}>
             <Table
+             loading={getAllSubLocationsLoading}
               columns={columns}
               dataSource={dataSource}
               scroll={{ x: "max-content" }}
             />
           </div>
-        )}
-      </div>
+      
 
       {/* delete sub-location modal */}
       <Modal
@@ -598,17 +577,9 @@ const SubLocations = () => {
             Cancel
           </Button>
 
-          {deleteASubLocationLoading ? (
+         
             <Button
-              type="primary"
-              htmlType="button"
-              loading
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
-              Please wait...
-            </Button>
-          ) : (
-            <Button
+              loading={deleteASubLocationLoading}
               onClick={deleteSubLocation}
               type="primary"
               htmlType="button"
@@ -617,7 +588,7 @@ const SubLocations = () => {
             >
               Delete
             </Button>
-          )}
+       
         </div>
       </Modal>
     </div>

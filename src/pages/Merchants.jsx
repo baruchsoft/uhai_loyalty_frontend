@@ -10,10 +10,10 @@ import {
   updateAPosType,
 } from "../features/posTypes/posTypeSlice";
 import { addMechant, getAllMechants } from "../features/loans/merhcantSlice";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdOutlineEdit } from "react-icons/md";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
 import MerchantRegistration from "./MerchantRegistration";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
   {
@@ -22,23 +22,23 @@ const columns = [
   },
   {
     title: "Name",
-    dataIndex: "name",
-  },
-  {
-    title: "Short Description",
-    dataIndex: "shortDesc",
+    dataIndex: "merchantName",
   },
   {
     title: "Email",
-    dataIndex: "email",
+    dataIndex: "emailAddress",
   },
   {
     title: "PhoneNumber",
-    dataIndex: "phoneNumber",
+    dataIndex: "mobileNumber",
   },
   {
     title: "Address",
-    dataIndex: "address",
+    dataIndex: "physicalAddress",
+  },
+  {
+    title: "Type",
+    dataIndex: "merchantType",
   },
   {
     title: "status",
@@ -51,11 +51,12 @@ const columns = [
 ];
 
 const POS_TYPES_SCHEMA = Yup.object().shape({
-  name: Yup.string().required("Please provide merchant name."),
-  shortDesc: Yup.string().required(
-    "Please provide merchant short description."
-  ),
-  email: Yup.string().required("Please provide email."),
+  merchantName: Yup.string().required("Please provide merchant name."),
+  type: Yup.string().required("Please provide merchant short description."),
+  emailAddress: Yup.string().required("Please provide email."),
+  mobileNumber: Yup.string().required("Please provide mobileNumber."),
+  physicalAddress: Yup.string().required("Please provide physicalAddress."),
+
   status: Yup.string()
     .oneOf(["ACTIVE", "INACTIVE"], "Please select a valid merchant status.")
     .required("Please select merchant status."),
@@ -125,23 +126,18 @@ const Merchants = () => {
 
   const formik = useFormik({
     initialValues: {
-      name: editingPosType?.name || "",
-      shortDesc: editingPosType?.shortDesc || "",
-      email: editingPosType?.email || "",
-      phoneNumber: editingPosType?.phoneNumber || "",
-      address: editingPosType?.address || "",
+      merchantName: editingPosType?.merchantName || "",
+      merchantType: editingPosType?.merchantType || "",
+      emailAddress: editingPosType?.emailAddress || "",
+      mobilNumber: editingPosType?.mobilNumber || "",
+      physicalAddress: editingPosType?.physicalAddress || "",
       status: editingPosType?.status || "INACTIVE",
     },
     enableReinitialize: true,
     validationSchema: POS_TYPES_SCHEMA,
     onSubmit: (values) => {
       if (editingPosType) {
-        dispatch(
-          updateAPosType({
-            posTypeCode: editingPosType?.posTypeCode,
-            posTypeData: values,
-          })
-        );
+        dispatch(addMechant(values));
       } else {
         dispatch(addMechant(values));
       }
@@ -175,17 +171,17 @@ const Merchants = () => {
     posTypes && Array.isArray(posTypes)
       ? posTypes.map((posType, index) => ({
           key: index + 1,
-          name: posType?.name,
-          shortDesc: posType?.shortDesc,
-          email: posType?.email,
-          phoneNumber: posType?.phoneNumber,
-          address: posType?.address,
+          merchantName: posType?.merchantName,
+          merchantType: posType?.merchantType,
+          emailAddress: posType?.emailAddress,
+          mobileNumber: posType?.mobileNumber,
+          physicalAddress: posType?.physicalAddress,
           status: posType?.status,
           action: (
             <>
               <div className="flex flex-row items-center gap-8 ">
                 <button type="button" onClick={() => showEditModal(posType)}>
-                  <FaEdit className="text-blue-600 font-medium text-xl" />
+                  <MdOutlineEdit className="text-blue-600 font-medium text-xl" />
                 </button>
                 <button
                   type="button"
@@ -194,7 +190,7 @@ const Merchants = () => {
                     showDeleteModal();
                   }}
                 >
-                  <MdDelete className="text-red-600  font-medium  text-xl" />
+                  <RiDeleteBinLine className="text-red-600  font-medium  text-xl" />
                 </button>
               </div>
             </>
@@ -227,7 +223,7 @@ const Merchants = () => {
             htmlType="button"
             href="/admin/loans/merchants/create-merchant"
             onClick={showModal}
-            className="text-sm font-semibold px-4 h-10 text-white font-sans "
+            className="text-sm font-semibold px-4 h-10 text-white font-sans"
           >
             + Merchant
           </Button>
@@ -265,8 +261,6 @@ const Merchants = () => {
           </div>
         )}
       </div>
-
-      {/* delete merchant modal */}
       <Modal
         title="Confirm merchant deletion?"
         open={isDeleteModalOpen}

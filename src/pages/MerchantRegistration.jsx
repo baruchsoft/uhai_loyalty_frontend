@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -15,14 +15,19 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
+import { addMechant } from "../features/loans/merhcantSlice";
+import { useDispatch } from "react-redux";
 
 const { Step } = Steps;
 const { Option } = Select;
 
-const MerchantRegistration = () => {
+const MerchantRegistration = ({ mode = "create", initialData }) => {
   const [current, setCurrent] = useState(0);
   const [merchantType, setMerchantType] = React.useState("Individual");
+  const [refType, setRefType] = React.useState("MERCHANT");
+
   const [form] = Form.useForm();
+  const dispatch = useDispatch();
 
   const next = () => {
     form
@@ -35,44 +40,37 @@ const MerchantRegistration = () => {
     setCurrent(current - 1);
   };
 
-  const handleFinish = (values) => {
-    console.log("Submitted values:", values);
-    message.success("Registration submitted!");
-  };
+  useEffect(() => {
+    if (mode === "edit" && initialData) {
+      form.setFieldsValue(initialData);
+    }
+  }, [mode, initialData, form]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (values) => {
     try {
-      const values = await form.validateFields();
+      const payload = { ...values };
 
-      const payload = {
-        id: 0,
-        merchantName: values.merchantName,
-        merchantType: values.merchantType,
-        idNumber: values.idNumber,
-        mobileNumber: values.mobileNumber,
-        emailAddress: values.emailAddress,
-        dateOfRegistration: values.dateOfRegistration,
-        physicalAddress: values.physicalAddress,
-        county: parseInt(values.county),
-        subCounty: parseInt(values.subCounty),
-        ward: parseInt(values.ward),
-        subLocation: parseInt(values.subLocation),
-        village: parseInt(values.village),
-        status: "ACTIVE",
-        accountMandate: values.accountMandate,
-        refereeMemberCode: parseInt(values.referee?.memberCode),
-      };
+      console.log("payload", payload);
 
-      const response = await axios.post(
-        "https://villagecan-api-production.up.railway.app/api/v1/merchants",
-        payload
-      );
+      const resultAction = await dispatch(addMechant(values));
+      console.log(resultAction, "resultAction");
 
-      message.success("Merchant registration successful!");
-      console.log("Response:", response.data);
+      if (mode === "edit") {
+        payload.id = initialData.id;
+        dispatch(addMechant(payload));
+        message.success("Merchant updated successfully!");
+      } else {
+        if (addMechant.fulfilled.match(payload)) {
+          message.success("Merchant registered successfully!");
+          // form.resetFields();
+          // setCurrent(0);
+        } else {
+          message.error(resultAction.payload || "Registration failed.");
+        }
+      }
     } catch (error) {
       console.error("Registration error:", error);
-      message.error("Registration failed. Please check form fields.");
+      message.error("An unexpected error occurred.");
     }
   };
 
@@ -124,7 +122,7 @@ const MerchantRegistration = () => {
           </Form.Item>
 
           <Form.Item
-            name="email"
+            name="emailAddress"
             label="Email Address"
             rules={[{ required: true, type: "email" }]}
           >
@@ -136,7 +134,7 @@ const MerchantRegistration = () => {
           </Form.Item>
 
           <Form.Item
-            name="address"
+            name="physicalAddress"
             label="Physical Address"
             rules={[{ required: true }]}
           >
@@ -150,14 +148,14 @@ const MerchantRegistration = () => {
       content: (
         <>
           <Form.Item
-            name="refereeName"
-            label="Referee Full Name"
+            name="accountMandate"
+            label="Account Mandate"
             rules={[{ required: true }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
-            name="refereeMemberNumber"
+            name="refereeMemberCode"
             label="Uhai Innovations Member Number"
             rules={[{ required: true }]}
           >
@@ -215,7 +213,7 @@ const MerchantRegistration = () => {
 
                     <Form.Item
                       {...restField}
-                      name={[name, "nationalId"]}
+                      name={[name, "idNumber"]}
                       label="National ID"
                       rules={[
                         { required: true, message: "National ID required" },
@@ -234,7 +232,33 @@ const MerchantRegistration = () => {
                     >
                       <Input />
                     </Form.Item>
+                    <Form.Item
+                      {...restField}
+                      name={[name, "refId"]}
+                      label="RefID"
+                      rules={[{ required: true, message: "RefID required" }]}
+                    >
+                      <Input type="number" />
+                    </Form.Item>
 
+                    <Form.Item
+                      name="refType"
+                      label="Ref Type"
+                      rules={[
+                        {
+                          required: false,
+                          message: "Please select refType",
+                        },
+                      ]}
+                    >
+                      <Select
+                        placeholder="Select refType"
+                        onChange={(value) => setRefType(value)}
+                      >
+                        <Option value="MERCHANT">MERCHANT</Option>
+                      </Select>
+                    </Form.Item>
+                    {/* 
                     <Form.Item
                       name={[name, "signature"]}
                       label="Signature (Image or PDF)"
@@ -252,9 +276,9 @@ const MerchantRegistration = () => {
                           Upload Signature
                         </Button>
                       </Upload>
-                    </Form.Item>
+                    </Form.Item> */}
 
-                    <Form.Item
+                    {/* <Form.Item
                       name={[name, "photo"]}
                       label="Passport Photograph"
                       valuePropName="fileList"
@@ -288,7 +312,7 @@ const MerchantRegistration = () => {
                           Upload Scanned ID
                         </Button>
                       </Upload>
-                    </Form.Item>
+                    </Form.Item> */}
                   </Space>
                 </div>
               ))}
@@ -312,7 +336,11 @@ const MerchantRegistration = () => {
       title: "Attachments",
       content: (
         <>
-          <Form.Item name="kraPin" label="KRA PIN" rules={[{ required: true }]}>
+          <Form.Item
+            name="kraPin"
+            label="KRA PIN"
+            rules={[{ required: false }]}
+          >
             <Upload maxCount={1} beforeUpload={() => false} accept=".pdf">
               <Button icon={<UploadOutlined />}>Upload KRA PIN (PDF)</Button>
             </Upload>
@@ -382,7 +410,15 @@ const MerchantRegistration = () => {
         onFinish={handleSubmit}
         autoComplete="off"
       >
-        {steps[current].content}
+        {/* {steps[current].content} */}
+        {steps.map((step, index) => (
+          <div
+            key={index}
+            style={{ display: index === current ? "block" : "none" }}
+          >
+            {step.content}
+          </div>
+        ))}
 
         <div className="mt-6 flex justify-between">
           {current > 0 && (
@@ -397,7 +433,7 @@ const MerchantRegistration = () => {
           )}
           {current === steps.length - 1 && (
             <Button type="primary" htmlType="submit">
-              Submit
+              {mode === "edit" ? "Update" : "Submit"}
             </Button>
           )}
         </div>

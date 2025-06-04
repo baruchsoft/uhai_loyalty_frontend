@@ -11,8 +11,8 @@ import {
   resetAccountState,
   updateAccount,
 } from "../features/loans/accountSlice";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete, MdEmojiFoodBeverage } from "react-icons/md";
+import {MdEmojiFoodBeverage, MdOutlineEdit } from "react-icons/md";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
   { title: "#", dataIndex: "key" },
@@ -64,8 +64,9 @@ const Accounts = () => {
 
   const formik = useFormik({
     initialValues: {
+      id: editingAccount?.id || "",
       ownerType: editingAccount?.ownerType || "",
-      ownerId: editingAccount?.ownerId || 0,
+      ownerId: editingAccount?.ownerId || 1,
       balance: editingAccount?.balance || "",
       accountName: editingAccount?.accountName || "",
       accountType: editingAccount?.accountType || "INACTIVE",
@@ -74,12 +75,7 @@ const Accounts = () => {
     validationSchema: ACCOUNT_SCHEMA,
     onSubmit: (values) => {
       if (editingAccount) {
-        dispatch(
-          updateAccount({
-            accountCode: editingAccount?.accountCode,
-            accountData: values,
-          })
-        );
+        dispatch(addAccount(values));
       } else {
         dispatch(addAccount(values));
       }
@@ -128,7 +124,7 @@ const Accounts = () => {
     action: (
       <div className="flex gap-4 items-center">
         <button onClick={() => showEditModal(account)}>
-          <FaEdit className="text-blue-600 text-xl" />
+          <MdOutlineEdit className="text-blue-600 text-xl" />
         </button>
         <button
           onClick={() => {
@@ -136,7 +132,7 @@ const Accounts = () => {
             showDeleteModal();
           }}
         >
-          <MdDelete className="text-red-600 text-xl" />
+          <RiDeleteBinLine className="text-red-600 text-xl" />
         </button>
       </div>
     ),

@@ -101,12 +101,7 @@ const MainLayout = () => {
 
   return (
     <Layout>
-      <Sider
-        trigger={null}
-        collapsible
-        collapsed={collapsed}
-        className="bg-white"
-      >
+      <Sider trigger={null} collapsible collapsed={collapsed} className="bg-white">
         <div className="flex items-center justify-center h-16 bg-blue-600">
           {!collapsed ? (
             <div
@@ -115,19 +110,8 @@ const MainLayout = () => {
             >
               <p className="text-white text-xl font-bold">VillageCAN</p>
               <Card
-                style={{
-                  margin: "4px",
-                  width: "72px",
-                  height: "20px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: "4px",
-                }}
-              >
-                <p style={{ fontSize: "14px", fontWeight: "600" }}>
-                  {decodedUser?.role}
-                </p>
+                style={{margin: "4px",width: "72px",height: "20px",display: "flex",alignItems: "center",justifyContent: "center",borderRadius: "4px", }}  >
+                <p style={{ fontSize: "14px", fontWeight: "600" }}> {decodedUser?.role}</p>
               </Card>
             </div>
           ) : (
@@ -147,28 +131,13 @@ const MainLayout = () => {
           items={[
             {
               key: "user-profile",
-              icon: (
-                <FaUser
-                  style={{ width: "16px", height: "16px", fontWeight: "800", fontSize: "30px" }}
-                />
-              ),
-              label: (
-                <p className="text-base font-medium cursor-pointer">
-                  Welcome {currentUser?.firstname}
-                </p>
-              ),
+              icon: (<FaUser style={{ width: "16px", height: "16px", fontWeight: "800", fontSize: "30px" }} />),
+              label: (<p className="text-base font-medium cursor-pointer">Welcome { currentUser && currentUser?.firstname}</p>),
             },
             {
               key: "dashboard",
               icon: (
-                <MdMapsHomeWork
-                  style={{
-                    width: "16px",
-                    height: "16px",
-                    fontWeight: "800",
-                    fontSize: "30px",
-                  }}
-                />
+                <MdMapsHomeWork style={{ width: "16px", height: "16px",fontWeight: "800",fontSize: "30px",}}/>
               ),
               label: <p className="text-base font-medium">Dashboard</p>,
             },
@@ -407,7 +376,7 @@ const MainLayout = () => {
               </div>
               <div className="flex flex-row gap-1  items-center">
                 <Avatar style={{cursor:"pointer"}} size={36}icon={<UserOutlined />} onClick={() => setOpen(!open)} className="shrink-0"/>
-                <button type="button" className="text-sm cursor-pointer font-medium" onClick={() => setOpen(!open)}>{currentUser?.firstname + " " + currentUser?.lastname} </button>
+                <button type="button" className="text-sm cursor-pointer font-medium" onClick={() => setOpen(!open)}>{ currentUser && `${currentUser?.firstname}  ${currentUser?.lastname}`}</button>
               </div>
             </div>
           </div>

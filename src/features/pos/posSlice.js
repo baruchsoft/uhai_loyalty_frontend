@@ -56,15 +56,24 @@ export const deleteAPos = createAsyncThunk(
   }
 );
 
+export const addASignatory = createAsyncThunk("pos/add-signatory", async({posCode,signatoryData}, thunkAPI)=>{
+  try {
+    return await posService.addSignatory(posCode,signatoryData)
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error)
+  }
+})
+ 
+
 export const resetPosState = createAction("Reset_all");
 
 const initialState = {
   poses: [],
   pos: null,
   addedPos: null,
-  error: {addAPos: false,getAllPoses: false,getAPos: false,updateAPos: false,deleteAPos: false,},
-  loading: {addAPos: false,getAllPoses: false,getAPos: false,updateAPos: false,deleteAPos: false,},
-  success: {addAPos: false,getAllPoses: false,getAPos: false,updateAPos: false,deleteAPos: false,},
+  error: {addAPos: false,getAllPoses: false,getAPos: false,updateAPos: false,deleteAPos: false,addASignatory:false},
+  loading: {addAPos: false,getAllPoses: false,getAPos: false,updateAPos: false,deleteAPos: false, addASignatory:false},
+  success: {addAPos: false,getAllPoses: false,getAPos: false,updateAPos: false,deleteAPos: false, addASignatory:false},
   message: "",
 };
 export const posSlice = createSlice({
@@ -148,6 +157,22 @@ export const posSlice = createSlice({
         state.loading.deleteAPos = false;
         state.error.deleteAPos = true;
         state.success.deleteAPos = false;
+        state.message = action?.error;
+      })
+       .addCase(addASignatory.pending, (state) => {
+        state.loading.addASignatory = true;
+      })
+      .addCase(addASignatory.fulfilled, (state, action) => {
+        state.loading.addASignatory = false;
+        state.error.addASignatory = false;
+        state.success.addASignatory = true;
+        state.response = action?.payload;
+        toast.success("Signatory added successfully.");
+      })
+      .addCase(addASignatory.rejected, (state, action) => {
+        state.loading.addASignatory = false;
+        state.error.addASignatory = true;
+        state.success.addASignatory = false;
         state.message = action?.error;
       })
       .addCase(resetPosState, () => initialState);

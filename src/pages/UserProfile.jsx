@@ -77,19 +77,19 @@ dispatch(getAllCountries())
 
      const userInfoFormik = useFormik({
       initialValues: {
-        userFirstname:  userData.firstname || "",
-        userLastname: userData.lastname || "",
-        userEmail: userData.email || "",
-        userPhone:userData.userPhoneNumber || "",
-        userIdNumber: userData.userIdNumber || "",
-        userHudumaNo: userData.userHudumaNumber || "",
-        userCountryCode:userData.country.countryCode || null
+        userFirstname:  userData?.firstname || "",
+        userLastname: userData?.lastname || "",
+        userEmail: userData?.email || "",
+        userPhone:userData?.userPhoneNumber || "",
+        userIdNumber: userData?.userIdNumber || "",
+        userHudumaNo: userData?.userHudumaNumber || "",
+        userCountryCode:userData?.country?.countryCode || null
       },
       enableReinitialize:true,
       validationSchema: USER_INFO_SCHEMA,
       onSubmit: (values) => {
         console.log(values,"=>userdData")
-        dispatch(updateAUser({userId: userData.id, userData:values}))
+        dispatch(updateAUser({userId: userData?.id, userData:values}))
       },
     });
 
@@ -132,7 +132,7 @@ dispatch(getAllCountries())
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   value={formik.values.currentPassword}
-                  className={`w-full  h-11 border-1.5 ${formik.touched.currentPassword && formik.errors.currentPassword ? "border-red-600": ""}`}
+                  className={`w-full  h-11 ${formik.touched.currentPassword && formik.errors.currentPassword ? "border-red-600": ""}`}
                 />
                 <button type="button" onClick={toggleCurrentPasswordVisibility} className="absolute right-3 top-2 text-xl text-gray-500 hover:text-gray-700 focus:outline-none">
                   {showCurrentPassword ? (<AiFillEye className="text-2xl" />) : (<AiFillEyeInvisible className="text-2xl"/>)}
@@ -151,7 +151,7 @@ dispatch(getAllCountries())
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   value={formik.values.newPassword}
-                  className={`w-full  h-11 border-1.5 ${formik.touched.newPassword && formik.errors.newPassword ? "border-red-600": ""}`}
+                  className={`w-full  h-11 ${formik.touched.newPassword && formik.errors.newPassword ? "border-red-600": ""}`}
                 />
                 <button type="button" onClick={toggleNewPasswordVisibility} className="absolute right-3 top-2 text-xl text-gray-500 hover:text-gray-700 focus:outline-none">
                   {showNewPassword ? (<AiFillEye className="text-2xl" />) : (<AiFillEyeInvisible className="text-2xl"/>)}
@@ -171,7 +171,7 @@ dispatch(getAllCountries())
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
                   value={formik.values.confirmationPassword}
-                  className={`w-full  h-11 border-1.5 ${formik.touched.confirmationPassword && formik.errors.confirmationPassword ? "border-red-600": ""}`}
+                  className={`w-full  h-11  ${formik.touched.confirmationPassword && formik.errors.confirmationPassword ? "border-red-600": ""}`}
                 />
                 <button type="button" onClick={toggleConfirmNewPasswordVisibility} className="absolute right-3 top-2 text-xl text-gray-500 hover:text-gray-700 focus:outline-none">
                   {showConfirmNewPassword ? (<AiFillEye className="text-2xl" />) : (<AiFillEyeInvisible className="text-2xl"/>)}
@@ -205,7 +205,7 @@ dispatch(getAllCountries())
                          onBlur={userInfoFormik.handleBlur}
                          onChange={userInfoFormik.handleChange}
                          value={userInfoFormik.values.userFirstname}
-                         className={`w-full  h-11 border-1.5 ${
+                         className={`w-full h-11 ${
                            userInfoFormik.touched.userFirstname && userInfoFormik.errors.userFirstname
                              ? "border-red-600"
                              : ""
@@ -222,7 +222,7 @@ dispatch(getAllCountries())
                          onBlur={userInfoFormik.handleBlur}
                          onChange={userInfoFormik.handleChange}
                          value={userInfoFormik.values.userEmail}
-                         className={`w-full  h-11 border-1.5 ${
+                         className={`w-full h-11 ${
                            userInfoFormik.touched.userEmail && userInfoFormik.errors.userEmail
                              ? "border-red-600"
                              : ""
@@ -240,7 +240,7 @@ dispatch(getAllCountries())
                          onBlur={userInfoFormik.handleBlur}
                          onChange={userInfoFormik.handleChange}
                          value={userInfoFormik.values.userPhone}
-                         className={`w-full h-11 border-1.5 ${
+                         className={`w-full h-11 ${
                            userInfoFormik.touched.userPhone && userInfoFormik.errors.userPhone
                              ? "border-red-600"
                              : ""
@@ -264,8 +264,8 @@ dispatch(getAllCountries())
                       Array.isArray(countries)
                         ? countries &&
                           countries.map((country) => ({
-                            value: country.countryCode,
-                            label: country.countryName,
+                            value: country?.countryCode,
+                            label: country?.countryName,
                           }))
                         : []
                     }
@@ -274,7 +274,7 @@ dispatch(getAllCountries())
                       userInfoFormik.setFieldValue("userCountryCode", value)
                     }
                     value={userInfoFormik.values.userCountryCode}
-                    className={`w-full h-11 border-1.5 rounded-lg ${
+                    className={`w-full h-11 ${
                       userInfoFormik.touched.userCountryCode &&
                       userInfoFormik.errors.userCountryCode
                         ? "border-red-600"
@@ -296,7 +296,7 @@ dispatch(getAllCountries())
                          onBlur={userInfoFormik.handleBlur}
                          onChange={userInfoFormik.handleChange}
                          value={userInfoFormik.values.userLastname}
-                         className={`w-full  h-11 border-1.5 ${
+                         className={`w-full  h-11 ${
                           userInfoFormik.touched.userLastname && userInfoFormik.errors.userLastname
                              ? "border-red-600"
                              : ""
@@ -314,7 +314,7 @@ dispatch(getAllCountries())
                          onBlur={userInfoFormik.handleBlur}
                          onChange={userInfoFormik.handleChange}
                          value={userInfoFormik.values.userIdNumber}
-                         className={`w-full  h-11 border-1.5 ${
+                         className={`w-full  h-11  ${
                            userInfoFormik.touched.userIdNumber && userInfoFormik.errors.userIdNumber
                              ? "border-red-600"
                              : ""
@@ -331,7 +331,7 @@ dispatch(getAllCountries())
                          onBlur={userInfoFormik.handleBlur}
                          onChange={userInfoFormik.handleChange}
                          value={userInfoFormik.values.userHudumaNo}
-                         className={`w-full  h-11 border-1.5 ${
+                         className={`w-full  h-11 ${
                            userInfoFormik.touched.userHudumaNo && userInfoFormik.errors.userHudumaNo
                              ? "border-red-600"
                              : ""

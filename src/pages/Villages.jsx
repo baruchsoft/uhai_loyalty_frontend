@@ -1,17 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Input, Modal, Select, Spin, Table } from "antd";
+import { Button, Input, Modal, Select, Table } from "antd";
 import * as Yup from "yup";
-import { MdDelete } from "react-icons/md";
-import { FaEdit } from "react-icons/fa";
+import { MdOutlineEdit } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import {addAVillage,deleteAVillage,getAllVillages,getAVillage,resetVillageState,updateAVillage} from "../features/village/villageSlice";
-import { Loading3QuartersOutlined } from "@ant-design/icons";
 import { useFormik } from "formik";
 import { getAllCountries } from "../features/country/countrySlice";
 import { getAllConstituencies } from "../features/constituency/constituencySlice";
 import { getAllCounties } from "../features/county/countySlice";
 import { getAllSubLocations } from "../features/subLocation/subLocationSlice";
 import { getAllWards } from "../features/ward/wardSlice";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
   {
@@ -206,10 +205,10 @@ const Villages = () => {
             <>
               <div className="flex flex-row items-center gap-8">
                 <button type="button" onClick={() => showEditModal(village)}>
-                  <FaEdit className="text-blue-600  font-medium text-xl" />
+                  <MdOutlineEdit className="text-blue-600  font-medium text-xl" />
                 </button>
                 <button type="button" onClick={() => {setSelectedVillageCode(village?.villageCode);showDeleteModal()}}>
-                  <MdDelete className="text-red-600  font-medium text-xl" />
+                  <RiDeleteBinLine className="text-red-600  font-medium text-xl" />
                 </button>
               </div>
             </>
@@ -616,27 +615,10 @@ const Villages = () => {
                   </div>
 
                  <div className="flex items-center justify-between  mt-4 ">
-                     <Button htmlType="button" onClick={() => { handleCancel();  setIsEditModalOpen(false);setEditingVillage(null)}} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
-                    {addAVillageLoading || updateAVillageLoading ? (
-                      <Button type="primary"  htmlType="button"  loading className="w-28 text-sm font-semibold h-10 text-white font-sans">Please wait...</Button>
-                    ) : (
-                      <Button type="primary" htmlType="submit" disabled={addAVillageLoading || updateAVillageLoading}  className="w-28 text-sm font-semibold h-10 text-white font-sans">{editingVillage ? "Update" : "Submit"}</Button>
-                    )}
+                      <Button htmlType="button" onClick={() => { handleCancel();  setIsEditModalOpen(false);setEditingVillage(null)}} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+                      <Button loading={addAVillageLoading || updateAVillageLoading} type="primary" htmlType="submit" disabled={addAVillageLoading || updateAVillageLoading}  className="w-28 text-sm font-semibold h-10 text-white font-sans">{editingVillage ? "Update" : "Submit"}</Button>
                 </div>
             </div>
-
-                
-
-
-               
-
-                 
-
-                 
-
-
-                
-
 
                 </div>
               </div>
@@ -645,31 +627,16 @@ const Villages = () => {
         </form>
       </Modal>
 
-      <div>
-        {getAllVillagesLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined
-                  style={{
-                    fontSize: 40,
-                    color: "#000",
-                  }}
-                  spin
-                />
-              }
-            />
-          </div>
-        ) : (
+     
           <div style={{ overflowX: "auto", width: "100%" }}>
             <Table
+              loading={getAllVillagesLoading}
               columns={columns}
               dataSource={dataSource}
               scroll={{ x: "max-content" }}
             />
           </div>
-        )}
-      </div>
+       
 
       <Modal
         title="Confirm village deletion? "
@@ -683,12 +650,8 @@ const Villages = () => {
         </div>
 
         <div className="flex items-center justify-end  mt-6  gap-8">
-          <Button htmlType="button" onClick={handleDeleteModalCancel}  className="w-28 text-sm font-semibold h-10 font-sans" >Cancel</Button>
-          {deleteAVillageLoading ? (
-            <Button type="primary"  htmlType="submit"  loading  className="w-28 text-sm font-semibold h-10 text-white font-sans">Please wait...</Button>
-          ) : (
-            <Button onClick={deleteVillage} type="primary" htmlType="submit"  disabled={deleteAVillageLoading}  className="w-28 text-sm font-semibold h-10 text-white font-sans">Delete</Button>
-          )}
+            <Button htmlType="button" onClick={handleDeleteModalCancel}  className="w-28 text-sm font-semibold h-10 font-sans" >Cancel</Button>
+            <Button loading={deleteAVillageLoading} onClick={deleteVillage} type="primary" htmlType="submit"  disabled={deleteAVillageLoading}  className="w-28 text-sm font-semibold h-10 text-white font-sans">Delete</Button>
         </div>
       </Modal>
     </div>

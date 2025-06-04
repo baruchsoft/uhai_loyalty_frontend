@@ -4,13 +4,13 @@ import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import {addAUniversity,deleteAUniversity,getAllUniversities,getAUniversity,resetUniversityState,updateAUniversity,} from "../features/university/universitySlice";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdOutlineEdit } from "react-icons/md";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
 import { getAllCountries } from "../features/country/countrySlice";
 import { getAllSubLocations } from "../features/subLocation/subLocationSlice";
 import { getAllCounties } from "../features/county/countySlice";
 import { getAllConstituencies } from "../features/constituency/constituencySlice";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
   {
@@ -208,11 +208,11 @@ const Universities = () => {
           action: (
             <div className="flex flex-row items-center gap-8">
               <button type="button" onClick={() => showEditModal(university)}>
-                <FaEdit className="text-blue-600 font-normal text-xl" />
+                <MdOutlineEdit className="text-blue-600 font-normal text-xl" />
               </button>
 
               <button type="button" onClick={() => {setSelectedUniversityCode(university?.universityCode); showDeleteModal();}}>
-                <MdDelete className="text-red-600 font-normal text-xl" />
+                <RiDeleteBinLine className="text-red-600 font-normal text-xl" />
               </button>
             </div>
           ),

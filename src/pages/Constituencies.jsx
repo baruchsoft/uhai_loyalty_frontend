@@ -4,11 +4,11 @@ import { Button, Input, Modal, Select, Spin, Table } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {addAConstituency,deleteAConstituency,getAConstituency,getAllConstituencies,resetConstituencyState,updateAConstituency,} from "../features/constituency/constituencySlice";
 import { useFormik } from "formik";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdOutlineEdit } from "react-icons/md";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
 import { getAllCountries } from "../features/country/countrySlice";
 import { getAllCounties } from "../features/county/countySlice";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
   {
@@ -163,7 +163,7 @@ const Constituencies = () => {
                   type="button"
                   onClick={() => showEditModal(constituencies)}
                 >
-                  <FaEdit className="text-blue-600  font-medium text-xl" />
+                  <MdOutlineEdit className="text-blue-600  font-medium text-xl" />
                 </button>
                 <button
                   type="button"
@@ -174,7 +174,7 @@ const Constituencies = () => {
                     showDeleteModal();
                   }}
                 >
-                  <MdDelete className="text-red-600  font-medium text-xl" />
+                  <RiDeleteBinLine className="text-red-600  font-medium text-xl" />
                 </button>
               </div>
             </>
@@ -446,40 +446,10 @@ const Constituencies = () => {
                   </div>
 
                   <div className="flex items-center justify-between  mt-4 ">
-                    <Button
-                      htmlType="button"
-                      onClick={() => {
-                        handleCancel();
-                        setIsEditModalOpen(false);
-                        setEditingConstituency(null);
-                      }}
-                      className="w-28 text-sm font-semibold h-10 font-sans"
-                    >
-                      Cancel
-                    </Button>
-
-                    {addAConstituencyLoading || updateAConstituencyLoading ? (
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        loading
-                        className="w-28 text-sm font-semibold h-10 text-white font-sans"
-                      >
-                        Please wait...
-                      </Button>
-                    ) : (
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        disabled={
-                          addAConstituencyLoading || updateAConstituencyLoading
-                        }
-                        className="w-28 text-sm font-semibold h-10 text-white font-sans"
-                      >
-                        {editingConstituency ? "Update" : "Submit"}
-                      </Button>
-                    )}
+                    <Button htmlType="button" onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingConstituency(null); }} className="w-28 text-sm font-semibold h-10 font-sans"> Cancel </Button>
+                    <Button type="primary" loading={ addAConstituencyLoading || updateAConstituencyLoading } htmlType="submit" disabled={ addAConstituencyLoading || updateAConstituencyLoading } className="w-28 text-sm font-semibold h-10 text-white font-sans"> {editingConstituency ? "Update" : "Submit"} </Button>
                   </div>
+                  
                 </div>
               </div>
             </div>
@@ -487,73 +457,15 @@ const Constituencies = () => {
         </form>
       </Modal>
 
-      <div>
-        {getAllConstituenciesLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined
-                  style={{
-                    fontSize: 40,
-                    color: "#000",
-                  }}
-                  spin
-                />
-              }
-            />
-          </div>
-        ) : (
-          <div style={{ overflowX: "auto", width: "100%" }}>
-            <Table
-              columns={columns}
-              dataSource={dataSource}
-              scroll={{ x: "max-content" }}
-            />
-          </div>
-        )}
+      <div style={{ overflowX: "auto", width: "100%" }}>
+        <Table loading={getAllConstituenciesLoading} columns={columns} dataSource={dataSource} scroll={{ x: "max-content" }}/>
       </div>
-
-      <Modal
-        title="Confirm constituency deletion? "
-        open={isDeleteModalOpen}
-        footer={null}
-        onCancel={handleDeleteModalCancel}
-      >
-        <div>
-          <p className="text-sm">
-            Are you sure you want to delete this constituency?
-          </p>
-        </div>
-
+    
+      <Modal title="Confirm constituency deletion? "open={isDeleteModalOpen} footer={null} onCancel={handleDeleteModalCancel} >
+        <p className="text-sm"> Are you sure you want to delete this constituency?</p>
         <div className="flex items-center justify-end  mt-6  gap-8">
-          <Button
-            htmlType="button"
-            onClick={handleDeleteModalCancel}
-            className="w-28 text-sm font-semibold h-10 font-sans"
-          >
-            Cancel
-          </Button>
-
-          {deleteAConstituencyLoading ? (
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
-              Please wait...
-            </Button>
-          ) : (
-            <Button
-              onClick={deleteConstituency}
-              type="primary"
-              htmlType="submit"
-              disabled={deleteAConstituencyLoading}
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
-              Delete
-            </Button>
-          )}
+            <Button htmlType="button" onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+            <Button onClick={deleteConstituency} type="primary" loading={deleteAConstituencyLoading }  htmlType="submit" disabled={deleteAConstituencyLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans" > Delete </Button>
         </div>
       </Modal>
     </div>

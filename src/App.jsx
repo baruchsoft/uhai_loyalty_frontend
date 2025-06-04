@@ -34,26 +34,109 @@ function App() {
   return (
     <Router>
       <Routes>
-          <Route path="*" element ={<NotFound/>}/>
-          <Route path="/" element={ <PublicRoutes><Signin /></PublicRoutes>} />
-          {/* register is for admin to use to register for testing*/} 
-          <Route path="/register" element={ <PublicRoutes> <Register/> </PublicRoutes> } /> 
-          <Route path="/forgot-password" element={ <PublicRoutes><ForgotPassword /></PublicRoutes>} />
-          <Route path="/verify-otp" element={<PublicRoutes><VerifyOtp /></PublicRoutes> } />
-          <Route path="/reset-password" element={ <PublicRoutes><ResetPassword /></PublicRoutes>} />
-          <Route path="/admin"element={<PrivateRoutes><MainLayout /></PrivateRoutes>}/>
-          <Route path="*" element={<NotFound />} />
-          <Route path="/" element={ <PublicRoutes> <Signin /> </PublicRoutes> }/>
-          <Route path="/forgot-password" element={  <PublicRoutes> <ForgotPassword /> </PublicRoutes>} />
-          <Route path="/verify-otp" element={  <PublicRoutes> <VerifyOtp />  </PublicRoutes> } />
-          <Route path="/reset-password" element={<PublicRoutes> <ResetPassword /></PublicRoutes>}/>
-          
-          <Route path="/admin" element={<PrivateRoutes> <MainLayout/></PrivateRoutes>}>
+        <Route path="*" element={<NotFound />} />
+        <Route
+          path="/"
+          element={
+            <PublicRoutes>
+              <Signin />
+            </PublicRoutes>
+          }
+        />
+        {/* register is for admin to use to register for testing*/}
+        <Route
+          path="/register"
+          element={
+            <PublicRoutes>
+              {" "}
+              <Register />{" "}
+            </PublicRoutes>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoutes>
+              <ForgotPassword />
+            </PublicRoutes>
+          }
+        />
+        <Route
+          path="/verify-otp"
+          element={
+            <PublicRoutes>
+              <VerifyOtp />
+            </PublicRoutes>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoutes>
+              <ResetPassword />
+            </PublicRoutes>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoutes>
+              <MainLayout />
+            </PrivateRoutes>
+          }
+        />
+        <Route path="*" element={<NotFound />} />
+        <Route
+          path="/"
+          element={
+            <PublicRoutes>
+              {" "}
+              <Signin />{" "}
+            </PublicRoutes>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoutes>
+              {" "}
+              <ForgotPassword />{" "}
+            </PublicRoutes>
+          }
+        />
+        <Route
+          path="/verify-otp"
+          element={
+            <PublicRoutes>
+              {" "}
+              <VerifyOtp />{" "}
+            </PublicRoutes>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoutes>
+              {" "}
+              <ResetPassword />
+            </PublicRoutes>
+          }
+        />
+
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoutes>
+              {" "}
+              <MainLayout />
+            </PrivateRoutes>
+          }
+        >
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="user-profile" element={<UserProfile />} />
           <Route path="users" element={<Users />} />
           <Route path="roles" element={<Roles />} />
-          <Route path="customers" element={<Customers />}/>
+          <Route path="customers" element={<Customers />} />
           <Route path="countries" element={<Countries />} />
           <Route path="counties" element={<Counties />} />
           <Route path="constituencies" element={<Constituencies />} />
@@ -68,7 +151,10 @@ function App() {
           <Route path="merchants" element={<Merchants />} />
           <Route path="accounts" element={<Accounts />} />
           <Route path="loans" element={<LoanManagement />} />
-          <Route path="loans/merchants/create-merchant" element={<MerchantRegistration />}/>
+          <Route
+            path="loans/merchants/create-merchant"
+            element={<MerchantRegistration mode="create" />}
+          />
         </Route>
       </Routes>
     </Router>

@@ -4,9 +4,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import {addAPosType,deleteAPosType,getAllPosTypes,getAPosType,resetPosTypeState,updateAPosType} from "../features/posTypes/posTypeSlice";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdOutlineEdit } from "react-icons/md";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
   {
@@ -159,7 +159,7 @@ const PosTypes = () => {
             <>
               <div className="flex flex-row items-center gap-8 ">
                 <button type="button" onClick={() => showEditModal(posType)}>
-                  <FaEdit className="text-blue-600 font-medium text-xl" />
+                  <MdOutlineEdit className="text-blue-600 font-medium text-xl" />
                 </button>
                 <button
                   type="button"
@@ -168,7 +168,7 @@ const PosTypes = () => {
                     showDeleteModal();
                   }}
                 >
-                  <MdDelete className="text-red-600  font-medium  text-xl" />
+                  <RiDeleteBinLine className="text-red-600  font-medium  text-xl" />
                 </button>
               </div>
             </>
@@ -385,36 +385,8 @@ const PosTypes = () => {
                   </div>
 
                   <div className="flex items-center justify-between  mt-4 ">
-                    <Button
-                      onClick={() => {
-                        handleCancel();
-                        setIsEditModalOpen(false);
-                        setEditingPosType(null);
-                      }}
-                      className="w-28 text-sm font-semibold h-10 font-sans"
-                    >
-                      Cancel
-                    </Button>
-
-                    {addAPosTypeLoading || updateAPosTypeLoading ? (
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        loading
-                        className="w-28 text-sm font-semibold h-10 text-white font-sans"
-                      >
-                        Please wait...
-                      </Button>
-                    ) : (
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        disabled={addAPosTypeLoading || updateAPosTypeLoading}
-                        className="w-28 text-sm font-semibold h-10 text-white font-sans"
-                      >
-                        {editingPosType ? "Update" : "Submit"}
-                      </Button>
-                    )}
+                      <Button onClick={() => {handleCancel();setIsEditModalOpen(false);setEditingPosType(null);}} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+                      <Button type="primary" loading={addAPosTypeLoading || updateAPosTypeLoading} htmlType="submit" disabled={addAPosTypeLoading || updateAPosTypeLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans">{editingPosType ? "Update" : "Submit"}</Button>
                   </div>
                 </div>
               </div>
@@ -423,39 +395,12 @@ const PosTypes = () => {
         </form>
       </Modal>
 
-      <div>
-        {getAllPosTypesLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined
-                  style={{
-                    fontSize: 40,
-                    color: "#000",
-                  }}
-                  spin
-                />
-              }
-            />
-          </div>
-        ) : (
-          <div style={{ overflowX: "auto", width: "100%" }}>
-            <Table
-              columns={columns}
-              dataSource={dataSource}
-              scroll={{ x: "max-content" }}
-            />
-          </div>
-        )}
+      <div style={{ overflowX: "auto", width: "100%" }}>
+        <Table loading={getAllPosTypesLoading} columns={columns}  dataSource={dataSource} scroll={{ x: "max-content" }}/>
       </div>
-
+    
       {/* delete pos type modal */}
-      <Modal
-        title="Confirm pos type deletion?"
-        open={isDeleteModalOpen}
-        footer={null}
-        onCancel={handleDeleteModalCancel}
-      >
+      <Modal title="Confirm pos type deletion?" open={isDeleteModalOpen} footer={null} onCancel={handleDeleteModalCancel}>
         <div>
           <p className="text-sm">
             Are you sure you want to delete this pos type?{" "}
@@ -463,12 +408,8 @@ const PosTypes = () => {
         </div>
 
         <div className="flex items-center justify-end  mt-6  gap-8">
-          <Button htmlType="button" onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans" > Cancel  </Button>
-          {deleteAPosTypeLoading ? (
-            <Button type="primary" htmlType="button" loading className="w-28 text-sm font-semibold h-10 text-white font-sans"> Please wait...</Button>
-          ) : (
-            <Button onClick={deletePosType} type="primary" htmlType="button" disabled={deleteAPosTypeLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans">Delete</Button>
-          )}
+            <Button htmlType="button" onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+            <Button loading={deleteAPosTypeLoading} onClick={deletePosType} type="primary" htmlType="button" disabled={deleteAPosTypeLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans">Delete</Button>
         </div>
       </Modal>
     </div>

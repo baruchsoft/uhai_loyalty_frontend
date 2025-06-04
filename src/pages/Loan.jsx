@@ -3,8 +3,7 @@ import * as Yup from "yup";
 import { Button, Input, Modal, Spin, Table, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdOutlineEdit } from "react-icons/md";
 import {
   getAllLoans,
   addALoan,
@@ -15,6 +14,7 @@ import {
 import { getAllPoses } from "../features/pos/posSlice";
 import { getAllMechants } from "../features/loans/merhcantSlice";
 import { getAllCustomers } from "../features/customers/customerSlice";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const LOAN_SCHEMA = Yup.object().shape({
   merchantId: Yup.number().required("Merchant ID is required."),
@@ -132,7 +132,7 @@ const LoanManagement = () => {
               setIsEditModalOpen(true);
             }}
           >
-            <FaEdit className="text-blue-500" />
+            <MdOutlineEdit className="text-blue-500" />
           </button>
           <button
             onClick={() => {
@@ -140,7 +140,7 @@ const LoanManagement = () => {
               dispatch(deleteALoan(loan.posCode));
             }}
           >
-            <MdDelete className="text-red-500" />
+            <RiDeleteBinLine className="text-red-500" />
           </button>
         </div>
       ),
@@ -188,7 +188,7 @@ const LoanManagement = () => {
                   ? merchants &&
                     merchants.map((merchant) => ({
                       value: merchant.id,
-                      label: merchant.name,
+                      label: merchant.merchantName,
                     }))
                   : []
               }
@@ -207,7 +207,7 @@ const LoanManagement = () => {
               </p>
             </div>
           </div>
-          <div className="flex flex-col">
+          <div className="w-full flex flex-col">
             <label htmlFor="customerId" className="text-sm font-semibold">
               Customer
             </label>
@@ -245,7 +245,7 @@ const LoanManagement = () => {
               </p>
             </div>
           </div>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col">
             <label htmlFor="posCode" className="text-sm font-semibold">
               PosCode
             </label>
@@ -264,7 +264,7 @@ const LoanManagement = () => {
                   ? poses &&
                     poses.map((pos) => ({
                       value: pos.posCode,
-                      label: pos.posCode,
+                      label: pos.groupName,
                     }))
                   : []
               }

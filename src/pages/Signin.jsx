@@ -79,10 +79,6 @@ const Signin = () => {
 // xl — Extra large screens (min-width: 1280px)
 // 2xl — 2x extra large screens (min-width: 1536px)    
 
-
-
-
-
   return (
     <div className="max-w-full min-h-screen bg-gray-200 overflow-hidden font-sans" >
       <div className="flex flex-col items-center justify-center md:py-4">
@@ -136,19 +132,7 @@ const Signin = () => {
             <div className="flex cursor-pointer ml-48">
               <Button type="link" htmlType="button" onClick={() => navigate("/forgot-password")}className="text-sm font-medium  text-blue-600">Forgot password</Button>
             </div>
-
-            {signInLoading ? (
-              <div>
-                <Button type="primary" htmlType="button" disabled loading className="w-80  h-11 mt-2 text-base font-medium font-sans">Please wait...</Button>
-              </div>
-            ) : (
-              <div>
-                <Button type="primary" htmlType="submit" disabled={signInLoading} className="w-80  h-11 mt-2 text-base  font-medium font-sans">Sign In</Button>
-              </div>
-            )}
-             {/* <div className="flex cursor-pointer">
-              <Button type="link" htmlType="button" onClick={() => navigate("/register")}className="text-sm font-medium  text-blue-600">Register</Button>
-            </div> */}
+             <Button loading={signInLoading} type="primary" htmlType="submit" disabled={signInLoading} className="w-80  h-11 mt-2 text-base  font-medium font-sans">Sign In</Button>
           </div>
         </form>
       </div>

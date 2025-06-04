@@ -3,55 +3,24 @@ import { Table, Button, Input, Modal, Select, Spin } from "antd";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addARole,
-  deleteARole,
-  getAllRoles,
-  getARole,
-  resetRoleState,
-  updateARole,
-} from "../features/role/roleSlice";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
-import { Loading3QuartersOutlined } from "@ant-design/icons";
+import { addARole, deleteARole, getAllRoles,getARole,resetRoleState,updateARole,} from "../features/role/roleSlice";
+import { MdDelete, MdOutlineEdit } from "react-icons/md";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
-  {
-    title: "#",
-    dataIndex: "key",
-  },
-  {
-    title: "Name",
-    dataIndex: "roleName",
-  },
-  {
-    title: "Short Description",
-    dataIndex: "roleShortDesc",
-  },
-
-  {
-    title: "Description",
-    dataIndex: "roleDescription",
-  },
-  {
-    title: "Status",
-    dataIndex: "roleStatus",
-  },
-  {
-    title: "Action",
-    dataIndex: "action",
-  },
+  {title: "#", dataIndex: "key",},
+  {title: "Name", dataIndex: "roleName", },
+  {title: "Short Description", dataIndex: "roleShortDesc",},
+  {title: "Description", dataIndex: "roleDescription",},
+  {title: "Status",dataIndex: "roleStatus",},
+  {title: "Action",dataIndex: "action",},
 ];
 
 const ROLE_SCHEMA = Yup.object().shape({
   roleName: Yup.string().required("Please provide role name."),
-  roleShortDesc: Yup.string().required(
-    "Please provide role short description."
-  ),
+  roleShortDesc: Yup.string().required("Please provide role short description."),
   roleDescription: Yup.string().required("Please provide role description."),
-  roleStatus: Yup.string()
-    .oneOf(["ACTIVE", "INACTIVE"], "Please select a valid role status.")
-    .required("Please select role status."),
+  roleStatus: Yup.string().oneOf(["ACTIVE", "INACTIVE"], "Please select a valid role status.").required("Please select role status."),
 });
 
 const Roles = () => {
@@ -61,34 +30,16 @@ const Roles = () => {
   const [selectedRoleCode, setSelectedRoleCode] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
-
   const roles = useSelector((state) => state?.role?.roles);
-  const getAllRolesLoading = useSelector(
-    (state) => state?.role?.loading?.getAllRoles
-  );
-
-  const addARoleSuccess = useSelector(
-    (state) => state?.role?.success?.addARole
-  );
+  const getAllRolesLoading = useSelector((state) => state?.role?.loading?.getAllRoles);
+  const addARoleSuccess = useSelector((state) => state?.role?.success?.addARole);
   const addedRole = useSelector((state) => state?.role?.addedRole);
-  const addARoleLoading = useSelector(
-    (state) => state?.role?.loading?.addARole
-  );
-
+  const addARoleLoading = useSelector((state) => state?.role?.loading?.addARole);
   const updatedRole = useSelector((state) => state?.role?.updatedRole);
-  const updateARoleSuccess = useSelector(
-    (state) => state?.role?.success?.updateARole
-  );
-  const updateARoleLoading = useSelector(
-    (state) => state?.role?.loading?.updateARole
-  );
-
-  const deleteARoleSuccess = useSelector(
-    (state) => state?.role?.success?.deleteARole
-  );
-  const deleteRoleLoading = useSelector(
-    (state) => state?.role?.loading?.deleteARole
-  );
+  const updateARoleSuccess = useSelector( (state) => state?.role?.success?.updateARole );
+  const updateARoleLoading = useSelector( (state) => state?.role?.loading?.updateARole );
+  const deleteARoleSuccess = useSelector((state) => state?.role?.success?.deleteARole );
+  const deleteRoleLoading = useSelector( (state) => state?.role?.loading?.deleteARole);
 
   const showModal = useCallback(() => {
     setIsModalOpen(true);
@@ -125,10 +76,7 @@ const Roles = () => {
     onSubmit: (values) => {
       if (editingRole) {
         dispatch(
-          updateARole({
-            roleCode: editingRole?.roleCode,
-            roleData: values,
-          })
+          updateARole({roleCode: editingRole?.roleCode,roleData: values,})
         );
       } else {
         dispatch(addARole(values));
@@ -171,16 +119,10 @@ const Roles = () => {
             <>
               <div className="flex flex-row items-center gap-8 ">
                 <button type="button" onClick={() => showEditModal(role)}>
-                  <FaEdit className="text-blue-600 font-medium text-xl" />
+                  <MdOutlineEdit className="text-blue-600 font-medium text-xl" />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedRoleCode(role?.roleCode);
-                    showDeleteModal();
-                  }}
-                >
-                  <MdDelete className="text-red-600  font-medium  text-xl" />
+                <button type="button" onClick={() => { setSelectedRoleCode(role?.roleCode); showDeleteModal();}}>
+                  <RiDeleteBinLine className="text-red-600  font-medium  text-xl" />
                 </button>
               </div>
             </>
@@ -395,37 +337,12 @@ const Roles = () => {
                   </div>
 
                   <div className="flex items-center justify-between  mt-4 ">
-                    <Button
-                      onClick={() => {
-                        handleCancel();
-                        setIsEditModalOpen(false);
-                        setEditingRole(null);
-                      }}
-                      className="w-28 text-sm font-semibold h-10 font-sans"
-                    >
-                      Cancel
+                    <Button onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingRole(null); }}  className="w-28 text-sm font-semibold h-10 font-sans"> Cancel </Button>
+                    <Button loading={ addARoleLoading || updateARoleLoading}  type="primary" htmlType="submit" disabled={addARoleLoading || updateARoleLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans" >
+                      {editingRole ? "Update" : "Submit"}
                     </Button>
-
-                    {addARoleLoading || updateARoleLoading ? (
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        loading
-                        className="w-28 text-sm font-semibold h-10 text-white font-sans"
-                      >
-                        Please wait...
-                      </Button>
-                    ) : (
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        disabled={addARoleLoading || updateARoleLoading}
-                        className="w-28 text-sm font-semibold h-10 text-white font-sans"
-                      >
-                        {editingRole ? "Update" : "Submit"}
-                      </Button>
-                    )}
                   </div>
+                  
                 </div>
               </div>
             </div>
@@ -433,72 +350,16 @@ const Roles = () => {
         </form>
       </Modal>
 
-      <div>
-        {getAllRolesLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined
-                  style={{
-                    fontSize: 40,
-                    color: "#000",
-                  }}
-                  spin
-                />
-              }
-            />
-          </div>
-        ) : (
           <div style={{ overflowX: "auto", width: "100%" }}>
-            <Table
-              columns={columns}
-              dataSource={dataSource}
-              scroll={{ x: "max-content" }}
-            />
+            <Table loading={getAllRolesLoading} columns={columns} dataSource={dataSource} scroll={{ x: "max-content" }}/>
           </div>
-        )}
-      </div>
 
       {/* delete role modal */}
-      <Modal
-        title="Confirm role deletion?"
-        open={isDeleteModalOpen}
-        footer={null}
-        onCancel={handleDeleteModalCancel}
-      >
-        <div>
-          <p className="text-sm">Are you sure you want to delete this role? </p>
-        </div>
-
+      <Modal title="Confirm role deletion?" open={isDeleteModalOpen} footer={null} onCancel={handleDeleteModalCancel}>
+       <div><p className="text-sm">Are you sure you want to delete this role? </p></div>
         <div className="flex items-center justify-end  mt-6  gap-8">
-          <Button
-            htmlType="button"
-            onClick={handleDeleteModalCancel}
-            className="w-28 text-sm font-semibold h-10 font-sans"
-          >
-            Cancel
-          </Button>
-
-          {deleteRoleLoading ? (
-            <Button
-              type="primary"
-              htmlType="button"
-              loading
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
-              Please wait...
-            </Button>
-          ) : (
-            <Button
-              onClick={deleteRole}
-              type="primary"
-              htmlType="button"
-              disabled={deleteRoleLoading}
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
-              Delete
-            </Button>
-          )}
+            <Button htmlType="button" onClick={handleDeleteModalCancel}  className="w-28 text-sm font-semibold h-10 font-sans"> Cancel </Button>
+            <Button loading={deleteRoleLoading} onClick={deleteRole} type="primary" htmlType="button" disabled={deleteRoleLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans"> Delete </Button>
         </div>
       </Modal>
     </div>

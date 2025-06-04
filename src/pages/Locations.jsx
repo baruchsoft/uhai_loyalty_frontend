@@ -9,8 +9,8 @@ import { getAllCountries } from '../features/country/countrySlice'
 import { getAllCounties } from '../features/county/countySlice'
 import { getAllConstituencies } from '../features/constituency/constituencySlice'
 import { getAllWards } from '../features/ward/wardSlice'
-import { MdDelete } from 'react-icons/md'
-import { FaEdit } from 'react-icons/fa'
+import { MdDelete, MdOutlineEdit } from 'react-icons/md'
+import { RiDeleteBinLine } from 'react-icons/ri'
 
 const locationColumns = [
   { 
@@ -73,17 +73,15 @@ const [selectedLocationCode,setSelectedLocationCode] = useState(null);
 const [isEditModalOpen,setIsEditModalOpen] = useState(false);
 const [editingLocation,setEditingLocation] = useState(null);
 
-const addedLocation = useSelector((state)=> state?.location?.addedLocation);
 const addLocationSuccess = useSelector((state)=> state?.location?.success?.addALocation)
-
 const countries = useSelector((state) => state?.country?.countries);
 const counties = useSelector((state) => state?.county?.counties);
 const constituencies = useSelector((state) => state?.constituency?.constituencies );
 const wards = useSelector((state) => state?.ward?.wards);
-
 const addALocationLoading = useSelector((state)=>state?.location?.loading?.addALocation);
 const updateALocationLoading = useSelector((state) => state?.location?.loading?.updateALocation);
 const getAllLocationsLoading = useSelector((state)=> state?.location?.loading?.getAllLocations)
+const deleteALocationLoading = useSelector((state)=>state?.location?.loading?.deleteALocation)
 
 
 useEffect(()=>{
@@ -191,10 +189,10 @@ useEffect(()=>{
             <>
               <div className="flex flex-row items-center gap-8 ">
                 <button type="button" onClick={() => showEditModal(location)}>
-                  <FaEdit className="text-blue-600 font-medium text-xl" />
+                  <MdOutlineEdit className="text-blue-600 font-medium text-xl" />
                 </button>
                 <button type="button" onClick={() => {setSelectedLocationCode(location?.locationCode);showDeleteModal();}}>
-                  <MdDelete className="text-red-600  font-medium  text-xl" />
+                  <RiDeleteBinLine className="text-red-600  font-medium  text-xl" />
                 </button>
               </div>
             </>
@@ -497,14 +495,10 @@ useEffect(()=>{
                   </div>
 
                   <div className="flex items-center justify-between  mt-4 ">
-                    <Button onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingLocation(null)}} className="w-28 text-sm font-semibold h-10 font-sans">Cancel </Button>
-                    {addALocationLoading || updateALocationLoading ? (
-                      <Button type="primary"  htmlType="button"  loading  className="w-28 text-sm font-semibold h-10 text-white font-sans"  > Please wait...  </Button>
-                    ) : (
-                      <Button  type="primary"  htmlType="submit" disabled={ addALocationLoading || updateALocationLoading }  className="w-28 text-sm font-semibold h-10 text-white font-sans">
+                      <Button onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingLocation(null)}} className="w-28 text-sm font-semibold h-10 font-sans">Cancel </Button>
+                       <Button  type="primary" loading={addALocationLoading || updateALocationLoading} htmlType="submit" disabled={ addALocationLoading || updateALocationLoading }  className="w-28 text-sm font-semibold h-10 text-white font-sans">
                         {editingLocation ? "Update" : "Submit"}
-                      </Button>
-                    )}
+                       </Button>
                   </div>
                 </div>
               </div>
@@ -513,20 +507,9 @@ useEffect(()=>{
         </form>
       </Modal>
 
-      <div>
-        {getAllLocationsLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined style={{ fontSize: 40, color: "#000",}}spin/>}
-            />
-          </div>
-        ) : (
-          <div style={{ overflowX: "auto", width: "100%" }}>
-            <Table columns={locationColumns} dataSource={dataSource} scroll={{ x: "max-content" }}/>
-          </div>
-        )}
-      </div>
+        <div style={{ overflowX: "auto", width: "100%" }}>
+          <Table loading={getAllLocationsLoading} columns={locationColumns} dataSource={dataSource} scroll={{ x: "max-content" }}/>
+        </div>
 
       {/* delete sub-location modal */}
       <Modal title="Confirm location deletion?" open={isDeleteModalOpen} footer={null} onCancel={handleDeleteModalCancel}>
@@ -535,13 +518,8 @@ useEffect(()=>{
         </div>
 
         <div className="flex items-center justify-end  mt-6  gap-8">
-          <Button htmlType="button" onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans"> Cancel</Button>
-          {addALocationLoading ? 
-          ( <Button type="primary"  htmlType="button" loading className="w-28 text-sm font-semibold h-10 text-white font-sans">Please wait...</Button>) 
-          :
-          (
-            <Button onClick={deleteLocation} type="primary" htmlType="button" className="w-28 text-sm font-semibold h-10 text-white font-sans" >Delete</Button>
-          )}
+            <Button htmlType="button" onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans"> Cancel</Button>
+            <Button disabled={deleteALocationLoading} loading={deleteALocationLoading} onClick={deleteLocation} type="primary" htmlType="button" className="w-28 text-sm font-semibold h-10 text-white font-sans" >Delete</Button>
         </div>
       </Modal>
     </div>

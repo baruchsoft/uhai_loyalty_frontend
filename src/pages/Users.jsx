@@ -3,49 +3,21 @@ import { Table, Button, Modal, Input, Select, Spin } from "antd";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { MdOutlineEdit } from "react-icons/md";
+import { RiDeleteBinLine } from "react-icons/ri";
 import {addAUser,deleteAUser,getAllUsers,getAUser,resetUserState,updateAUser} from "../features/user/userSlice";
 import { getAllRoles } from "../features/role/roleSlice";
 import { getAllCountries } from "../features/country/countrySlice";
-import { Loading3QuartersOutlined } from "@ant-design/icons";
 
 const columns = [
-  {
-    title: "#",
-    dataIndex: "key",
-  },
-  {
-    title: "Full Name",
-    dataIndex: "fullname",
-  },
-  {
-    title: "Email",
-    dataIndex: "email",
-  },
-
-  {
-    title: "Phone Number",
-    dataIndex: "userPhoneNumber",
-  },
-
-  {
-    title: "ID Number",
-    dataIndex: "userIdNumber",
-  },
-  {
-    title: "Role",
-    dataIndex: "role",
-  },
-
-  {
-    title: "Country",
-    dataIndex: "userCountryCode",
-  },
-  {
-    title: "Action",
-    dataIndex: "action",
-  },
+  {title: "#",dataIndex: "key",},
+  {title: "Full Name",dataIndex: "fullname",},
+  {title: "Email", dataIndex: "email",},
+  {title: "Phone Number", dataIndex: "userPhoneNumber",},
+  {title: "ID Number", dataIndex: "userIdNumber",},
+  {title: "Role", dataIndex: "role", },
+  {title: "Country", dataIndex: "userCountryCode",},
+  {title: "Action", dataIndex: "action",},
 ];
 
 const phoneNumberRegex = /^(\+?[1-9]\d{1,14}|0\d{1,14})$/;
@@ -221,10 +193,10 @@ const Users = () => {
               <>
                 <div className="flex flex-row items-center gap-8">
                   <button type="button" onClick={() => showEditModal(user)}>
-                    <FaEdit className="text-blue-600 font-normal text-xl" />
+                    <MdOutlineEdit className="text-blue-600 font-normal text-xl" />
                   </button>
                   <button type="button" onClick={() => {setSelectedUserId(user?.id);showDeleteModal();}}>
-                    <MdDelete className="text-red-600 font-normal text-xl" />
+                    <RiDeleteBinLine className="text-red-600 font-normal text-xl" />
                   </button>
                 </div>
               </>
@@ -282,7 +254,7 @@ const Users = () => {
                     }}
                     onChange={formik.handleChange}
                     value={formik.values.userFirstname}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${
+                    className={`w-80 lg:w-72 md:w-64 h-11  ${
                       formik.touched.userFirstname &&
                       formik.errors.userFirstname
                         ? "border-red-600"
@@ -325,7 +297,7 @@ const Users = () => {
                     }}
                     onChange={formik.handleChange}
                     value={formik.values.userLastname}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${
+                    className={`w-80 lg:w-72 md:w-64 h-11 ${
                       formik.touched.userLastname && formik.errors.userLastname
                         ? "border-red-600"
                         : ""
@@ -351,7 +323,7 @@ const Users = () => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     value={formik.values.userEmail}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${
+                    className={`w-80 lg:w-72 md:w-64 h-11 ${
                       formik.touched.userEmail && formik.errors.userEmail
                         ? "border-red-600"
                         : ""
@@ -375,7 +347,7 @@ const Users = () => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     value={formik.values.userPhone}
-                    className={`w-80 lg:w-72 h-11 md:w-64 border-1.5 ${
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${
                       formik.touched.userPhone && formik.errors.userPhone
                         ? "border-red-600"
                         : ""
@@ -403,7 +375,7 @@ const Users = () => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     value={formik.values.userIdNumber}
-                    className={`w-80 lg:w-72 md:w-64 h-11 border-1.5 ${
+                    className={`w-80 lg:w-72 md:w-64 h-11 ${
                       formik.touched.userIdNumber && formik.errors.userIdNumber
                         ? "border-red-600"
                         : ""
@@ -436,7 +408,7 @@ const Users = () => {
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     value={formik.values.userHudumaNo}
-                    className={`w-80 lg:w-72 h-11 md:w-64 border-1.5 ${
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${
                       formik.touched.userHudumaNo && formik.errors.userHudumaNo
                         ? "border-red-600"
                         : ""
@@ -479,7 +451,7 @@ const Users = () => {
                     onBlur={formik.handleBlur}
                     onChange={(value) => formik.setFieldValue("roleId", value)}
                     value={formik.values.roleId}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${
                       formik.touched.roleId && formik.errors.roleId
                         ? "border-red-600"
                         : ""
@@ -524,7 +496,7 @@ const Users = () => {
                       formik.setFieldValue("userCountryCode", value)
                     }
                     value={formik.values.userCountryCode}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${
                       formik.touched.userCountryCode &&
                       formik.errors.userCountryCode
                         ? "border-red-600"
@@ -567,7 +539,7 @@ const Users = () => {
                       formik.setFieldValue("userStatus", value)
                     }
                     value={formik.values.userStatus}
-                    className={`w-80 lg:w-72 h-11 border-1.5 md:w-64 rounded-lg ${
+                    className={`w-80 lg:w-72 h-11 md:w-64 ${
                       formik.touched.userStatus && formik.errors.userStatus
                         ? "border-red-600"
                         : ""
@@ -581,37 +553,8 @@ const Users = () => {
                 </div>
 
                 <div className="flex items-center justify-between lg:justify-end gap-8 lg:gap-12 mt-4 ">
-                  <Button
-                    htmlType="button"
-                    onClick={() => {
-                      handleCancel();
-                      setIsEditModalOpen(false);
-                      setEditingUser(null);
-                    }}
-                    className="w-28 text-sm font-semibold h-10 font-sans"
-                  >
-                    Cancel
-                  </Button>
-
-                  {addAUserLoading || updateAUserLoading ? (
-                    <Button
-                      type="primary"
-                      htmlType="button"
-                      loading
-                      className="w-28 text-sm font-semibold h-10 text-white font-sans"
-                    >
-                      Please wait...
-                    </Button>
-                  ) : (
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      disabled={addAUserLoading || updateAUserLoading}
-                      className="w-28 text-sm font-semibold h-10 text-white font-sans"
-                    >
-                      {editingUser ? "Update" : "Submit"}
-                    </Button>
-                  )}
+                    <Button htmlType="button" onClick={() => {handleCancel(); setIsEditModalOpen(false); setEditingUser(null); }} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+                    <Button loading = { addAUserLoading || updateAUserLoading} type="primary" htmlType="submit" disabled={addAUserLoading || updateAUserLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans" > {editingUser ? "Update" : "Submit"} </Button>
                 </div>
               </div>
             </div>
@@ -620,68 +563,28 @@ const Users = () => {
       </Modal>
 
       <div>
-        {getAllUsersLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined
-                  style={{
-                    fontSize: 40,
-                    color: "#000",
-                  }}
-                  spin
-                />
-              }
-            />
-          </div>
-        ) : (
           <div style={{ overflowX: "auto", width: "100%" }}>
-            <Table
-              columns={columns}
-              dataSource={dataSource}
-              scroll={{ x: "max-content" }}
-            />
+            <Table loading={getAllUsersLoading} columns={columns} dataSource={dataSource} scroll={{ x: "max-content" }} />
           </div>
-        )}
       </div>
 
       {/* delete user modal */}
-      <Modal
-        title="Confirm user deletion?"
-        open={isDeleteModalOpen}
-        footer={null}
-        onCancel={handleDeleteModalCancel}
-      >
+      <Modal title="Confirm user deletion?" open={isDeleteModalOpen} footer={null} onCancel={handleDeleteModalCancel} >
         <div>
           <p className="text-sm">Are you sure you want to delete this user? </p>
         </div>
 
         <div className="flex items-center justify-end  mt-6  gap-8">
-          <Button
-            htmlType="button"
-            onClick={handleDeleteModalCancel}
-            className="w-28 text-sm font-semibold h-10 font-sans"
-          >
+          <Button  htmlType="button" onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans"  >
             Cancel
           </Button>
 
           {deleteAUserLoading ? (
-            <Button
-              type="primary"
-              htmlType="button"
-              loading
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
+            <Button type="primary" htmlType="button" loading className="w-28 text-sm font-semibold h-10 text-white font-sans" >
               Please wait...
             </Button>
           ) : (
-            <Button
-              onClick={deleteUser}
-              type="primary"
-              htmlType="button"
-              disabled={deleteAUserLoading}
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
+            <Button onClick={deleteUser} type="primary" htmlType="button" disabled={deleteAUserLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans">
               Delete
             </Button>
           )}

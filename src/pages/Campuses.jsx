@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button, Input, Modal, Select, Spin, Table } from "antd";
 import * as Yup from "yup";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
-import { MdDelete } from "react-icons/md";
-import { FaEdit } from "react-icons/fa";
+import { MdOutlineEdit } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import {addACampus,deleteACampus,getACampus,getAllCampuses,resetCampusState,updateACampus} from "../features/campus/campusSlice";
 import { useFormik } from "formik";
@@ -11,6 +10,7 @@ import { getAllCountries } from "../features/country/countrySlice";
 import { getAllCounties } from "../features/county/countySlice";
 import { getAllConstituencies } from "../features/constituency/constituencySlice";
 import { getAllUniversities } from "../features/university/universitySlice";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
   {
@@ -222,7 +222,7 @@ const Campuses = () => {
             <>
               <div className="flex flex-row items-center gap-8 ">
                 <button type="button" onClick={() => showEditModal(campus)}>
-                  <FaEdit className="text-blue-600 font-medium text-xl" />
+                  <MdOutlineEdit className="text-blue-600 font-medium text-xl" />
                 </button>
                 <button
                   type="button"
@@ -231,7 +231,7 @@ const Campuses = () => {
                     showDeleteModal();
                   }}
                 >
-                  <MdDelete className="text-red-600  font-medium  text-xl" />
+                  <RiDeleteBinLine className="text-red-600  font-medium  text-xl" />
                 </button>
               </div>
             </>

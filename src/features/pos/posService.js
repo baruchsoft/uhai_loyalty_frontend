@@ -35,12 +35,15 @@ const deletePos = async (posCode) => {
   }
 };
 
-const posService = {
-  addPos,
-  getPos,
-  getPoses,
-  updatePos,
-  deletePos,
-};
+const addSignatory = async(posCode, signatoryData)=>{
+  const newsignatoryData = [signatoryData]
+  console.log(newsignatoryData,"=>signaData")
+  const response = await newRequest.post(`pos/${posCode}/signatories`,newsignatoryData);
+  if(response){
+    return response
+  }
+}
+
+const posService = {addPos,getPos,getPoses,updatePos,deletePos,addSignatory};
 
 export default posService;

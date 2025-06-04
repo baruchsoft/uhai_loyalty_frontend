@@ -1,53 +1,27 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Table, Button, Modal, Spin, Input, Select } from "antd";
+import { Table, Button, Modal,Input, Select } from "antd";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
-import {addACounty,deleteACounty,getACounty,getAllCounties,resetCountyState,updateACounty} from "../features/county/countySlice";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
-import { Loading3QuartersOutlined } from "@ant-design/icons";
+import { addACounty,deleteACounty,getACounty,getAllCounties,resetCountyState,updateACounty} from "../features/county/countySlice";
+import { MdOutlineEdit } from "react-icons/md";
 import { getAllCountries } from "../features/country/countrySlice";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
-  {
-    title: "#",
-    dataIndex: "key",
-  },
-  {
-    title: "Name",
-    dataIndex: "countyName",
-  },
-  {
-    title: "Short Description",
-    dataIndex: "countyShortDesc",
-  },
-
-  {
-    title: "Country",
-    dataIndex: "countyCountryCode",
-  },
-  {
-    title: "Status",
-    dataIndex: "countyStatus",
-  },
-  {
-    title: "Action",
-    dataIndex: "action",
-  },
+  {title: "#", dataIndex: "key",},
+  {title: "Name",dataIndex: "countyName",},
+  {title: "Short Description",dataIndex: "countyShortDesc",},
+  {title: "Country", dataIndex: "countyCountryCode",},
+  {title: "Status",dataIndex: "countyStatus",},
+  {title: "Action",dataIndex: "action",},
 ];
 
 const COUNTY_SCHEMA = Yup.object().shape({
   countyName: Yup.string().required("Please provide county name."),
-  countyShortDesc: Yup.string().required(
-    "Please provide county short description."
-  ),
-  countyCountryCode: Yup.number()
-    .typeError("Country code must be a number.")
-    .required("Please select county country."),
-  countyStatus: Yup.string()
-    .oneOf(["ACTIVE", "INACTIVE"], "Please select a valid county status.")
-    .required("Please select county status."),
+  countyShortDesc: Yup.string().required("Please provide county short description."),
+  countyCountryCode: Yup.number().typeError("Country code must be a number.").required("Please select county country."),
+  countyStatus: Yup.string().oneOf(["ACTIVE", "INACTIVE"], "Please select a valid county status.").required("Please select county status."),
 });
 
 const Counties = () => {
@@ -59,30 +33,16 @@ const Counties = () => {
   const [editingCounty, setEditingCounty] = useState(null);
 
   const addedCounty = useSelector((state) => state?.county?.addedCounty);
-  const addACountySuccess = useSelector(
-    (state) => state?.county?.success?.addACounty
-  );
-  const updateACountyLoading = useSelector(
-    (state) => state?.county?.loading?.updateACounty
-  );
+  const addACountySuccess = useSelector((state) => state?.county?.success?.addACounty);
+  const updateACountyLoading = useSelector((state) => state?.county?.loading?.updateACounty);
   const updatedCounty = useSelector((state) => state?.county?.updatedCounty);
-  const updateACountySuccess = useSelector(
-    (state) => state?.county?.success?.updateACounty
-  );
+  const updateACountySuccess = useSelector((state) => state?.county?.success?.updateACounty);
   const counties = useSelector((state) => state?.county?.counties);
-  const getAllCountiesLoading = useSelector(
-    (state) => state?.county?.loading?.getAllCounties
-  );
-  const deleteACountyLoading = useSelector(
-    (state) => state?.county?.loading?.deleteACounty
-  );
-  const addACountyLoading = useSelector(
-    (state) => state?.county?.loading?.addACounty
-  );
+  const getAllCountiesLoading = useSelector((state) => state?.county?.loading?.getAllCounties);
+  const deleteACountyLoading = useSelector((state) => state?.county?.loading?.deleteACounty);
+  const addACountyLoading = useSelector((state) => state?.county?.loading?.addACounty);
   const countries = useSelector((state) => state?.country?.countries);
-  const deleteACountySuccess = useSelector(
-    (state) => state?.county?.success?.deleteACounty
-  );
+  const deleteACountySuccess = useSelector((state) => state?.county?.success?.deleteACounty);
 
   const showModal = useCallback(() => {
     setIsModalOpen(true);
@@ -110,7 +70,7 @@ const Counties = () => {
       countyName: editingCounty?.countyName || "",
       countyShortDesc: editingCounty?.countyShortDesc || "",
       countyCountryCode: editingCounty?.country?.countryCode || null,
-      countyStatus: editingCounty?.countyStatus || "INACTIVE",
+      countyStatus: editingCounty?.countyStatus || null,
     },
     enableReinitialize: true,
     validationSchema: COUNTY_SCHEMA,
@@ -168,7 +128,7 @@ const Counties = () => {
             <>
               <div className="flex flex-row items-center gap-8">
                 <button type="button" onClick={() => showEditModal(county)}>
-                  <FaEdit className="text-blue-600  font-medium text-xl" />
+                  <MdOutlineEdit className="text-blue-600  font-medium text-xl" />
                 </button>
                 <button
                   type="button"
@@ -177,7 +137,7 @@ const Counties = () => {
                     showDeleteModal();
                   }}
                 >
-                  <MdDelete className="text-red-600  font-medium text-xl" />
+                  <RiDeleteBinLine className="text-red-600  font-medium text-xl" />
                 </button>
               </div>
             </>
@@ -206,7 +166,7 @@ const Counties = () => {
         <h2 className="text-xl font-bold">Counties</h2>
         <div>
           <Button type="primary" htmlType="button" onClick={showModal} className="text-sm font-semibold px-4 h-10 text-white font-sans ">
-            + County
+            + New County
           </Button>
         </div>
       </div>
@@ -410,38 +370,10 @@ const Counties = () => {
                   </div>
 
                   <div className="flex items-center justify-between  mt-4 ">
-                    <Button
-                      htmlType="button"
-                      onClick={() => {
-                        handleCancel();
-                        setIsEditModalOpen(false);
-                        setEditingCounty(null);
-                      }}
-                      className="w-28 text-sm font-semibold h-10 font-sans"
-                    >
-                      Cancel
-                    </Button>
-
-                    {addACountyLoading || updateACountyLoading ? (
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        loading
-                        className="w-28 text-sm font-semibold h-10 text-white font-sans"
-                      >
-                        Please wait...
-                      </Button>
-                    ) : (
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        disabled={addACountyLoading || updateACountyLoading}
-                        className="w-28 text-sm font-semibold h-10 text-white font-sans"
-                      >
-                        {editingCounty ? "Update" : "Submit"}
-                      </Button>
-                    )}
+                      <Button htmlType="button"  onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingCounty(null); }} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+                      <Button type="primary" htmlType="submit" loading ={addACountyLoading || updateACountyLoading } disabled={addACountyLoading || updateACountyLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans">{editingCounty ? "Update" : "Submit"}</Button>
                   </div>
+
                 </div>
               </div>
             </div>
@@ -449,73 +381,18 @@ const Counties = () => {
         </form>
       </Modal>
 
-      <div>
-        {getAllCountiesLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined
-                  style={{
-                    fontSize: 40,
-                    color: "#000",
-                  }}
-                  spin
-                />
-              }
-            />
-          </div>
-        ) : (
-          <div style={{ overflowX: "auto", width: "100%" }}>
-            <Table
-              columns={columns}
-              dataSource={dataSource}
-              scroll={{ x: "max-content" }}
-            />
-          </div>
-        )}
-      </div>
+        <div style={{ overflowX: "auto", width: "100%" }}>
+          <Table loading={getAllCountiesLoading}  columns={columns} dataSource={dataSource} scroll={{ x: "max-content" }}  />
+        </div>
 
-      <Modal
-        title="Confirm county deletion."
-        open={isDeleteModalOpen}
-        footer={null}
-        onCancel={handleDeleteModalCancel}
-      >
+      <Modal title="Confirm county deletion." open={isDeleteModalOpen} footer={null}  onCancel={handleDeleteModalCancel} >
         <div>
-          <p className="text-sm">
-            Are you sure you want to delete this county?
-          </p>
+          <p className="text-sm"> Are you sure you want to delete this county?</p>
         </div>
 
         <div className="flex items-center justify-end  mt-6  gap-8">
-          <Button
-            htmlType="button"
-            onClick={handleDeleteModalCancel}
-            className="w-28 text-sm font-semibold h-10 font-sans"
-          >
-            Cancel
-          </Button>
-
-          {deleteACountyLoading ? (
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
-              Please wait...
-            </Button>
-          ) : (
-            <Button
-              onClick={deleteCounty}
-              type="primary"
-              htmlType="submit"
-              disabled={deleteACountyLoading}
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
-              Delete
-            </Button>
-          )}
+            <Button htmlType="button" onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+            <Button onClick={deleteCounty} type="primary" htmlType="submit" loading={deleteACountyLoading} disabled={deleteACountyLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans" >  Delete</Button>
         </div>
       </Modal>
     </div>

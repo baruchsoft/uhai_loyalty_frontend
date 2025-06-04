@@ -5,11 +5,11 @@ import { Loading3QuartersOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import {addAWard,deleteAWard,getAllWards,getAWard,resetWardState,updateAWard} from "../features/ward/wardSlice";
-import { FaEdit } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdOutlineEdit } from "react-icons/md";
 import { getAllCountries } from "../features/country/countrySlice";
 import { getAllCounties } from "../features/county/countySlice";
 import { getAllConstituencies } from "../features/constituency/constituencySlice";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
   {
@@ -133,7 +133,7 @@ const Wards = () => {
       wardCountryCode: editingWard?.country?.countryCode || null,
       wardCountyCode: editingWard?.county?.countyCode || null,
       wardConstituencyCode: editingWard?.constituency?.constituencyCode || null,
-      wardStatus: editingWard?.wardStatus || "INACTIVE",
+      wardStatus: editingWard?.wardStatus || null,
     },
     enableReinitialize: true,
     validationSchema: WARD_SCHEMA,
@@ -203,7 +203,7 @@ const Wards = () => {
             <>
               <div className="flex flex-row items-center gap-8 ">
                 <button type="button" onClick={() => showEditModal(ward)}>
-                  <FaEdit className="text-blue-600 font-medium text-xl" />
+                  <MdOutlineEdit className="text-blue-600 font-medium text-xl" />
                 </button>
                 <button
                   type="button"
@@ -212,7 +212,7 @@ const Wards = () => {
                     showDeleteModal();
                   }}
                 >
-                  <MdDelete className="text-red-600  font-medium  text-xl" />
+                  <RiDeleteBinLine className="text-red-600  font-medium  text-xl" />
                 </button>
               </div>
             </>
@@ -244,7 +244,7 @@ const Wards = () => {
         <h2 className="text-xl font-bold">Wards</h2>
         <div>
           <Button type="primary" htmlType="button" onClick={showModal} className="text-sm font-semibold px-4 h-10 text-white font-sans ">
-            + Ward
+            + New Ward
           </Button>
         </div>
       </div>
@@ -301,7 +301,7 @@ const Wards = () => {
                       }}
                       onChange={formik.handleChange}
                       value={formik.values.wardName}
-                      className={`w-80 h-11 border-1.5 ${
+                      className={`w-80 h-11 ${
                         formik.touched.wardName && formik.errors.wardName
                           ? "border-red-600"
                           : ""
@@ -336,7 +336,7 @@ const Wards = () => {
                       }}
                       onChange={formik.handleChange}
                       value={formik.values.wardShortDesc}
-                      className={`w-80 h-11 border-1.5 ${
+                      className={`w-80 h-11 ${
                         formik.touched.wardShortDesc &&
                         formik.errors.wardShortDesc
                           ? "border-red-600"
@@ -382,7 +382,7 @@ const Wards = () => {
                         formik.setFieldValue("wardCountryCode", value)
                       }
                       value={formik.values.wardCountryCode}
-                      className={`w-80  h-11 border-1.5 rounded-lg ${
+                      className={`w-80  h-11 ${
                         formik.touched.wardCountryCode &&
                         formik.errors.wardCountryCode
                           ? "border-red-600"
@@ -428,7 +428,7 @@ const Wards = () => {
                         formik.setFieldValue("wardCountyCode", value)
                       }
                       value={formik.values.wardCountyCode}
-                      className={`w-80  h-11 border-1.5 rounded-lg ${
+                      className={`w-80  h-11 ${
                         formik.touched.wardCountyCode &&
                         formik.errors.wardCountyCode
                           ? "border-red-600"
@@ -474,7 +474,7 @@ const Wards = () => {
                         formik.setFieldValue("wardConstituencyCode", value)
                       }
                       value={formik.values.wardConstituencyCode}
-                      className={`w-80  h-11 border-1.5 rounded-lg ${
+                      className={`w-80  h-11 ${
                         formik.touched.wardConstituencyCode &&
                         formik.errors.wardConstituencyCode
                           ? "border-red-600"
@@ -518,7 +518,7 @@ const Wards = () => {
                         formik.setFieldValue("wardStatus", value)
                       }
                       value={formik.values.wardStatus}
-                      className={`w-80  h-11 border-1.5 rounded-lg ${
+                      className={`w-80 h-11 ${
                         formik.touched.wardStatus && formik.errors.wardStatus
                           ? "border-red-600"
                           : ""
@@ -543,17 +543,8 @@ const Wards = () => {
                       Cancel
                     </Button>
 
-                    {addAWardLoading || updateAWardLoading ? (
                       <Button
-                        type="primary"
-                        htmlType="button"
-                        loading
-                        className="w-28 text-sm font-semibold h-10 text-white font-sans"
-                      >
-                        Please wait...
-                      </Button>
-                    ) : (
-                      <Button
+                        loading={ addAWardLoading || updateAWardLoading}
                         type="primary"
                         htmlType="submit"
                         disabled={addAWardLoading || updateAWardLoading}
@@ -561,7 +552,7 @@ const Wards = () => {
                       >
                         {editingWard ? "Update" : "Submit"}
                       </Button>
-                    )}
+                 
                   </div>
                 </div>
               </div>
@@ -570,31 +561,17 @@ const Wards = () => {
         </form>
       </Modal>
 
-      <div>
-        {getAllWardsLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined
-                  style={{
-                    fontSize: 40,
-                    color: "#000",
-                  }}
-                  spin
-                />
-              }
-            />
-          </div>
-        ) : (
+    
+    
           <div style={{ overflowX: "auto", width: "100%" }}>
             <Table
+              loading={getAllWardsLoading}
               columns={columns}
               dataSource={dataSource}
               scroll={{ x: "max-content" }}
             />
           </div>
-        )}
-      </div>
+     
 
       {/* delete ward modal */}
       <Modal
@@ -616,17 +593,9 @@ const Wards = () => {
             Cancel
           </Button>
 
-          {deleteWardLoading ? (
+        
             <Button
-              type="primary"
-              htmlType="button"
-              loading
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
-              Please wait...
-            </Button>
-          ) : (
-            <Button
+             loading={deleteWardLoading}
               onClick={deleteWard}
               type="primary"
               htmlType="button"
@@ -635,7 +604,7 @@ const Wards = () => {
             >
               Delete
             </Button>
-          )}
+          
         </div>
       </Modal>
     </div>
