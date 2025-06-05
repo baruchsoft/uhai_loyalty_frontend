@@ -1,6 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
-import storage from "redux-persist/lib/storage"; 
+import storage from "redux-persist/lib/storage";
 import authReducer from "../features/auth/authSlice";
 import countryReducer from "../features/country/countrySlice";
 import userReducer from "../features/user/userSlice";
@@ -12,14 +12,14 @@ import subLocationReducer from "../features/subLocation/subLocationSlice";
 import universityReducer from "../features/university/universitySlice";
 import campusReducer from "../features/campus/campusSlice";
 import villageReducer from "../features/village/villageSlice";
-import customerReducer from "../features/customer/customerSlice"
+import customerReducer from "../features/customer/customerSlice";
 import posTypeReducer from "../features/posTypes/posTypeSlice";
 import posReducer from "../features/pos/posSlice";
 import locationReducer from "../features/location/locationSlice";
 import merchantReducer from "../features/loans/merhcantSlice";
 import loanReducer from "../features/loans/loanSlice";
 import accountReducer from "../features/loans/accountSlice";
-
+import SignatoryReducer from "../features/loans/signatorySlice";
 const persistConfig = {
   key: "root",
   storage,
@@ -45,6 +45,7 @@ const rootReducer = combineReducers({
   loan: loanReducer,
   account: accountReducer,
   customer: customerReducer,
+  signatory: SignatoryReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
