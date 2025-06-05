@@ -1,4 +1,5 @@
-import { Button, Input, Modal, Select, Spin, Table } from "antd";
+/* eslint-disable no-unused-vars */
+import { Button, Input, message, Modal, Select, Spin, Table } from "antd";
 import { useFormik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +15,7 @@ import { MdDelete, MdOutlineEdit } from "react-icons/md";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
 import MerchantRegistration from "./MerchantRegistration";
 import { RiDeleteBinLine } from "react-icons/ri";
+import MerchantInfoForm from "./merchants/MerchantInfoForm";
 
 const columns = [
   {
@@ -69,7 +71,7 @@ const Merchants = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedPosTypeCode, setSelectedPosTypeCode] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingPosType, setEditingPosType] = useState(false);
+  const [editingMerchant, setEditingMerchant] = useState(true);
 
   const getAllMechantsLoading = useSelector(
     (state) => state?.merchant?.loading?.getAllMerchants
@@ -118,25 +120,33 @@ const Merchants = () => {
     setIsDeleteModalOpen(false);
   }, []);
 
-  const showEditModal = async (posType) => {
-    setEditingPosType(posType);
-    setIsEditModalOpen(true);
-    await dispatch(getAPosType(posType?.posTypeCode));
+  const handleEdit = async (emailAddress) => {
+    const merchant = posTypes.find((m) => m.emailAddress === emailAddress);
+    console.log("merchant", merchant);
+
+    if (merchant) {
+      setSelectedPosTypeCode(merchant);
+      setIsModalOpen(true);
+    } else {
+      message.error("Merchant not found");
+    }
   };
+
+  console.log(selectedPosTypeCode, "selectedPosTypeCode");
 
   const formik = useFormik({
     initialValues: {
-      merchantName: editingPosType?.merchantName || "",
-      merchantType: editingPosType?.merchantType || "",
-      emailAddress: editingPosType?.emailAddress || "",
-      mobilNumber: editingPosType?.mobilNumber || "",
-      physicalAddress: editingPosType?.physicalAddress || "",
-      status: editingPosType?.status || "INACTIVE",
+      merchantName: editingMerchant?.merchantName || "",
+      merchantType: editingMerchant?.merchantType || "",
+      emailAddress: editingMerchant?.emailAddress || "",
+      mobilNumber: editingMerchant?.mobilNumber || "",
+      physicalAddress: editingMerchant?.physicalAddress || "",
+      status: editingMerchant?.status || "INACTIVE",
     },
     enableReinitialize: true,
     validationSchema: POS_TYPES_SCHEMA,
     onSubmit: (values) => {
-      if (editingPosType) {
+      if (editingMerchant) {
         dispatch(addMechant(values));
       } else {
         dispatch(addMechant(values));
@@ -163,7 +173,7 @@ const Merchants = () => {
       setIsEditModalOpen(false);
       dispatch(resetPosTypeState());
       dispatch(getAllMechants());
-      setEditingPosType(null);
+      setEditingMerchant(null);
     }
   }, [updatedPosType, updateAPosTypeSuccess, dispatch]);
 
@@ -171,6 +181,7 @@ const Merchants = () => {
     posTypes && Array.isArray(posTypes)
       ? posTypes.map((posType, index) => ({
           key: index + 1,
+          id: posType?.id,
           merchantName: posType?.merchantName,
           merchantType: posType?.merchantType,
           emailAddress: posType?.emailAddress,
@@ -180,13 +191,16 @@ const Merchants = () => {
           action: (
             <>
               <div className="flex flex-row items-center gap-8 ">
-                <button type="button" onClick={() => showEditModal(posType)}>
+                <button
+                  type="button"
+                  onClick={() => handleEdit(posType?.emailAddress)}
+                >
                   <MdOutlineEdit className="text-blue-600 font-medium text-xl" />
                 </button>
                 <button
                   type="button"
                   onClick={() => {
-                    setSelectedPosTypeCode(posType?.id);
+                    handleEdit(posType?.emailAddress);
                     showDeleteModal();
                   }}
                 >
@@ -222,7 +236,6 @@ const Merchants = () => {
             type="primary"
             htmlType="button"
             href="/admin/loans/merchants/create-merchant"
-            onClick={showModal}
             className="text-sm font-semibold px-4 h-10 text-white font-sans"
           >
             + Merchant
@@ -261,6 +274,19 @@ const Merchants = () => {
           </div>
         )}
       </div>
+      <Modal
+        title={editingMerchant ? "Edit Merchant" : "Add Merchant"}
+        open={isModalOpen}
+        footer={null}
+        onCancel={() => {
+          setIsModalOpen(false);
+          setEditingMerchant(null);
+        }}
+        destroyOnClose
+      >
+        <MerchantInfoForm initialData={selectedPosTypeCode} mode="edit" />
+      </Modal>
+
       <Modal
         title="Confirm merchant deletion?"
         open={isDeleteModalOpen}

@@ -7,15 +7,23 @@ import { addMechant } from "../../features/loans/merhcantSlice";
 const { Option } = Select;
 
 const MerchantInfoForm = ({ mode, initialData }) => {
-  const [merchantType, setMerchantType] = useState("Individual");
+  const [merchantType, setMerchantType] = React.useState("Individual");
   const [refType, setRefType] = useState("MERCHANT");
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
+  React.useEffect(() => {
+    if (initialData) {
+      form.setFieldsValue(initialData);
+      setMerchantType(initialData.merchantType || "Individual");
+    }
+  }, [initialData, form]);
+
   const handleSubmit = async (values) => {
     try {
       const payload = { ...values };
-      if (mode === "edit") payload.id = initialData.id;
+      console.log("payload", payload);
+      if (mode === "edit") payload.id = initialData?.id;
       const resultAction = await dispatch(addMechant(payload));
 
       if (addMechant.fulfilled.match(resultAction)) {
