@@ -58,6 +58,14 @@ const SignatoriesForm = ({ merchantId }) => {
           <Input />
         </Form.Item>
 
+        <Form.Item
+          name="nationality"
+          label="Nationality"
+          rules={[{ required: true }]}
+        >
+          <Input />
+        </Form.Item>
+
         <Form.Item name="refId" label="RefID" rules={[{ required: true }]}>
           <Input type="number" />
         </Form.Item>
