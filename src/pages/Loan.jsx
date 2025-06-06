@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useCallback, useEffect, useState } from "react";
 import * as Yup from "yup";
 import { Button, Input, Modal, Spin, Table, Select } from "antd";
@@ -35,6 +36,8 @@ const LoanManagement = () => {
   const loans = useSelector((state) => state?.loan?.getAllLoans);
   const poses = useSelector((state) => state?.pos?.poses);
   const customers = useSelector((state) => state?.customer?.customers);
+
+  console.log("customers", customers);
 
   const merchants = useSelector((state) => state?.merchant?.merchants);
   const loanAdded = useSelector((state) => state?.loan?.success?.addALoan);
@@ -226,22 +229,22 @@ const LoanManagement = () => {
                   ? customers &&
                     customers.map((customer) => ({
                       value: customer.id,
-                      label: customer.name,
+                      label: customer.fullName,
                     }))
                   : []
               }
               onBlur={formik.handleBlur}
-              onChange={(value) => formik.setFieldValue("customer", value)}
+              onChange={(value) => formik.setFieldValue("customerId", value)}
               value={formik.values.id}
               className={`w-80 h-11 border-1.5 rounded-lg ${
-                formik.touched.customer && formik.errors.customerId
+                formik.touched.customerId && formik.errors.customerId
                   ? "border-red-600"
                   : ""
               }`}
             />
             <div>
               <p className="text-xs text-red-600">
-                {formik.touched.customer && formik.errors.customerId}
+                {formik.touched.customerId && formik.errors.customerId}
               </p>
             </div>
           </div>
