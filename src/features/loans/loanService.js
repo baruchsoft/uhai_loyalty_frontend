@@ -1,7 +1,7 @@
 import { newRequest } from "../../utils/newRequest";
 
 const addALoan = async (loanData) => {
-  const response = await newRequest.post("loan", loanData);
+  const response = await newRequest.post("loan/request-loan", loanData);
   return response.data;
 };
 
