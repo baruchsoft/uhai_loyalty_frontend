@@ -16,6 +16,7 @@ import { Loading3QuartersOutlined } from "@ant-design/icons";
 import MerchantRegistration from "./MerchantRegistration";
 import { RiDeleteBinLine } from "react-icons/ri";
 import MerchantInfoForm from "./merchants/MerchantInfoForm";
+import { Link } from "react-router-dom";
 
 const columns = [
   {
@@ -232,14 +233,14 @@ const Merchants = () => {
       <div className="flex justify-between mb-2">
         <h2 className="text-xl font-bold">Merchants</h2>
         <div>
-          <Button
-            type="primary"
-            htmlType="button"
-            href="/admin/loans/merchants/create-merchant"
-            className="text-sm font-semibold px-4 h-10 text-white font-sans"
-          >
-            + Merchant
-          </Button>
+          <Link to="/admin/loans/merchants/create-merchant">
+            <Button
+              type="primary"
+              className="text-sm font-semibold px-4 h-10 text-white font-sans"
+            >
+              + Merchant
+            </Button>
+          </Link>
         </div>
       </div>
 
