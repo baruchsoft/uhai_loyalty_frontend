@@ -321,7 +321,7 @@ const MerchantRegistration = ({ mode = "create", initialData }) => {
           <MerchantInfoForm mode={mode} initialData={initialData} />
         </TabPane>
         <TabPane tab="Signatories" key="2">
-          <SignatoriesForm merchantId={initialData?.id} />
+          <SignatoriesForm />
         </TabPane>
       </Tabs>
     </div>

@@ -3,10 +3,12 @@ import toast from "react-hot-toast";
 import signatoryService from "./signatoryService";
 
 export const addSignatory = createAsyncThunk(
-  "merchants",
+  "signatories",
   async (sigdata, thunkAPI) => {
     try {
-      return await signatoryService.addSignatory(sigdata);
+      const siddatarres = await signatoryService.addSignatory(sigdata);
+      console.log("siddatarres", siddatarres);
+      return siddatarres;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
@@ -14,7 +16,7 @@ export const addSignatory = createAsyncThunk(
 );
 
 export const getSignaories = createAsyncThunk(
-  "merchants/get/all",
+  "signatories/get/all",
   async (thunkAPI) => {
     try {
       const sigsdata = await signatoryService.getSignaories();
@@ -47,7 +49,7 @@ const initialState = {
   message: "",
 };
 export const signatorySlice = createSlice({
-  name: "merchant",
+  name: "signatory",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -59,7 +61,7 @@ export const signatorySlice = createSlice({
         state.loading.getSignaories = false;
         state.error.getSignaories = false;
         state.success.getSignaories = true;
-        state.merchants = action?.payload;
+        state.signatories = action?.payload;
       })
       .addCase(getSignaories.rejected, (state, action) => {
         state.loading.getSignaories = false;
