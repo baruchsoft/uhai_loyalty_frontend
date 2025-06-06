@@ -13,7 +13,7 @@ const SignatoriesForm = ({ merchantId }) => {
   const handleAdd = async (values) => {
     try {
       const payload = { ...values, merchantId };
-      const result = await dispatch(addSignatory(payload));
+      const result = dispatch(addSignatory(payload));
 
       if (addSignatory.fulfilled.match(result)) {
         setSignatories((prev) => [...prev, values]);
