@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import loanService from "./loanService";
+import toast from "react-hot-toast";
 
 export const addALoan = createAsyncThunk(
   "loan/add",
@@ -90,8 +91,6 @@ export const loanSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-
-      // Add loan
       .addCase(addALoan.pending, (state) => {
         state.loading.addALoan = true;
       })
@@ -99,13 +98,13 @@ export const loanSlice = createSlice({
         state.loading.addALoan = false;
         state.success.addALoan = true;
         state.loans.push(action.payload);
+        toast.success("Loan requested successfully.");
       })
       .addCase(addALoan.rejected, (state, action) => {
         state.loading.addALoan = false;
         state.error = action.payload;
       })
 
-      // Get all loans
       .addCase(getAllLoans.pending, (state) => {
         state.loading.getAllLoans = true;
       })
