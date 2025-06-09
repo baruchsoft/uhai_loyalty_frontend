@@ -189,7 +189,7 @@ const Villages = () => {
     }
   }, [updatedVillage, updateAVillageSuccess, dispatch]);
 
-  const dataSource =
+  const dataSource = 
     villages && Array.isArray(villages)
       ? villages.map((village, index) => ({
           key: index + 1,

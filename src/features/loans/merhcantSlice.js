@@ -13,6 +13,17 @@ export const addMechant = createAsyncThunk(
   }
 );
 
+export const updateMechant = createAsyncThunk(
+  "merchants/update",
+  async (merchantData, thunkAPI) => {
+    try {
+      return await merchantService.updateMerchant(merchantData);
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
 export const getAllMechants = createAsyncThunk(
   "merchants/get/all",
   async (thunkAPI) => {
@@ -31,18 +42,22 @@ export const resetMerchantState = createAction("Reset_all");
 const initialState = {
   merchants: [],
   merchant: null,
+  updateMechant: null,
   addMechant: null,
   error: {
     addMechant: false,
     getAllMechants: false,
+    updateMechant: false,
   },
   loading: {
     addMechant: false,
     getAllMechants: false,
+    updateMechant: false,
   },
   success: {
     addMechant: false,
     getAllMechants: false,
+    updateMechant: false,
   },
   message: "",
 };
@@ -67,6 +82,22 @@ export const merchantSlice = createSlice({
         state.success.getAllMechants = false;
         state.message = action?.error;
       })
+      .addCase(updateMechant.pending, (state) => {
+        state.loading.updateMechant = true;
+      })
+      .addCase(updateMechant.fulfilled, (state, action) => {
+        state.loading.updateMechant = false;
+        state.success.updateMechant = true;
+        state.error.updateMechant = false;
+        state.updateMechant = action?.payload;
+        toast.success("Merchant updated successfully.");
+      })
+      .addCase(updateMechant.rejected, (state, action) => {
+        state.loading.updateMechant = false;
+        state.success.updateMechant = false;
+        state.error.updateMechant = true;
+        state.message = action?.error;
+      })
       .addCase(addMechant.pending, (state) => {
         state.loading.addMechant = true;
       })
@@ -83,7 +114,6 @@ export const merchantSlice = createSlice({
         state.success.addMechant = false;
         state.message = action?.error;
       })
-
       .addCase(resetMerchantState, () => initialState);
   },
 });

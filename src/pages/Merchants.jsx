@@ -10,7 +10,7 @@ import {
   resetPosTypeState,
   updateAPosType,
 } from "../features/posTypes/posTypeSlice";
-import { addMechant, getAllMechants } from "../features/loans/merhcantSlice";
+import { addMechant, getAllMechants, updateMechant } from "../features/loans/merhcantSlice";
 import { MdDelete, MdOutlineEdit } from "react-icons/md";
 import { Loading3QuartersOutlined } from "@ant-design/icons";
 import MerchantRegistration from "./MerchantRegistration";
@@ -148,7 +148,7 @@ const Merchants = () => {
     validationSchema: POS_TYPES_SCHEMA,
     onSubmit: (values) => {
       if (editingMerchant) {
-        dispatch(addMechant(values));
+        dispatch(updateMechant(values));
       } else {
         dispatch(addMechant(values));
       }

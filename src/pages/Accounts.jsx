@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Button, Input, Modal, Select, Spin, Table } from "antd";
 import { useFormik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
@@ -11,7 +12,7 @@ import {
   resetAccountState,
   updateAccount,
 } from "../features/loans/accountSlice";
-import {MdEmojiFoodBeverage, MdOutlineEdit } from "react-icons/md";
+import { MdEmojiFoodBeverage, MdOutlineEdit } from "react-icons/md";
 import { RiDeleteBinLine } from "react-icons/ri";
 
 const columns = [
@@ -114,29 +115,31 @@ const Accounts = () => {
     }
   }, [successFlags?.deleteAccount, dispatch]);
 
-  const dataSource = Array.isArray(accounts) && accounts?.map((account, index) => ({
-    key: index + 1,
-    ownerType: account?.ownerType,
-    ownerId: account?.ownerId,
-    balance: account?.balance,
-    accountName: account?.accountName,
-    accountType: account?.accountType,
-    action: (
-      <div className="flex gap-4 items-center">
-        <button onClick={() => showEditModal(account)}>
-          <MdOutlineEdit className="text-blue-600 text-xl" />
-        </button>
-        <button
-          onClick={() => {
-            setSelectedAccountCode(account?.accountCode);
-            showDeleteModal();
-          }}
-        >
-          <RiDeleteBinLine className="text-red-600 text-xl" />
-        </button>
-      </div>
-    ),
-  }));
+  const dataSource =
+    Array.isArray(accounts) &&
+    accounts?.map((account, index) => ({
+      key: index + 1,
+      ownerType: account?.ownerType,
+      ownerId: account?.ownerId,
+      balance: account?.balance,
+      accountName: account?.accountName,
+      accountType: account?.accountType,
+      action: (
+        <div className="flex gap-4 items-center">
+          <button onClick={() => showEditModal(account)}>
+            <MdOutlineEdit className="text-blue-600 text-xl" />
+          </button>
+          <button
+            onClick={() => {
+              setSelectedAccountCode(account?.accountCode);
+              showDeleteModal();
+            }}
+          >
+            <RiDeleteBinLine className="text-red-600 text-xl" />
+          </button>
+        </div>
+      ),
+    }));
 
   const deleteAccountHandler = async () => {
     if (selectedAccountCode) {
@@ -205,6 +208,19 @@ const Accounts = () => {
             />
             {formik.touched.balance && formik.errors.balance && (
               <p className="text-xs text-red-600">{formik.errors.balance}</p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-semibold">Owner ID</label>
+            <Input
+              id="ownerId"
+              name="ownerId"
+              onChange={formik.handleChange}
+              value={formik.values.ownerId}
+              onBlur={formik.handleBlur}
+            />
+            {formik.touched.ownerId && formik.errors.ownerId && (
+              <p className="text-xs text-red-600">{formik.errors.ownerId}</p>
             )}
           </div>
 
