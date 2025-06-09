@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Form, Input, Select, Button, message } from "antd";
 import { useDispatch } from "react-redux";
-import { addMechant } from "../../features/loans/merhcantSlice";
+import { addMechant, updateMechant } from "../../features/loans/merhcantSlice";
 
 const { Option } = Select;
 
@@ -24,14 +24,15 @@ const MerchantInfoForm = ({ mode, initialData }) => {
       const payload = { ...values };
       console.log("payload", payload);
       if (mode === "edit") payload.id = initialData?.id;
-      const resultAction = await dispatch(addMechant(payload));
+      const resultAction = await dispatch(updateMechant(payload));
 
-      if (addMechant.fulfilled.match(resultAction)) {
+      if (updateMechant.fulfilled.match(resultAction)) {
         message.success(
           mode === "edit"
             ? "Merchant updated successfully"
             : "Merchant registered successfully"
         );
+        form.resetFields();
       } else {
         message.error("Merchant submission failed");
       }
