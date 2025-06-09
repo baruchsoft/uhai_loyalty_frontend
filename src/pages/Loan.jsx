@@ -287,12 +287,6 @@ const LoanManagement = () => {
             </div>
           </div>
           <Input
-            name="ownerId"
-            placeholder="Owner ID"
-            value={formik.values.ownerId}
-            onChange={formik.handleChange}
-          />
-          <Input
             name="amount"
             placeholder="Amount"
             value={formik.values.amount}

@@ -210,6 +210,19 @@ const Accounts = () => {
               <p className="text-xs text-red-600">{formik.errors.balance}</p>
             )}
           </div>
+          <div>
+            <label className="block text-sm font-semibold">Owner ID</label>
+            <Input
+              id="ownerId"
+              name="ownerId"
+              onChange={formik.handleChange}
+              value={formik.values.ownerId}
+              onBlur={formik.handleBlur}
+            />
+            {formik.touched.ownerId && formik.errors.ownerId && (
+              <p className="text-xs text-red-600">{formik.errors.ownerId}</p>
+            )}
+          </div>
 
           <div>
             <label className="block text-sm font-semibold">Account Name</label>
