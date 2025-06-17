@@ -20,6 +20,8 @@ import merchantReducer from "../features/loans/merhcantSlice";
 import loanReducer from "../features/loans/loanSlice";
 import accountReducer from "../features/loans/accountSlice";
 import SignatoryReducer from "../features/loans/signatorySlice";
+import loanproductReducer from "../features/loans/loanproductSlice";
+import grouploanReducer from "../features/loans/grouploanSlice";
 const persistConfig = {
   key: "root",
   storage,
@@ -46,6 +48,8 @@ const rootReducer = combineReducers({
   account: accountReducer,
   customer: customerReducer,
   signatory: SignatoryReducer,
+  loanproduct: loanproductReducer,
+  grouploan: grouploanReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

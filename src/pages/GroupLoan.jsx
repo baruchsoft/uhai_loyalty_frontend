@@ -19,17 +19,14 @@ import { RiDeleteBinLine } from "react-icons/ri";
 
 const LOAN_SCHEMA = Yup.object().shape({
   merchantId: Yup.number().required("Merchant ID is required."),
-  customerId: Yup.number().required("Customer ID is required."),
-  posCode: Yup.number().required("POS Code is required."),
-  loanProductId: Yup.number().required("loanProductId ID is required."),
-  groupLoanId: Yup.number().required("groupLoanId  is required."),
-  amount: Yup.number().required("Amount is required."),
+  loanProductId: Yup.number().required("Customer ID is required."),
+  groupId: Yup.number().required("POS Code is required."),
+  totalAmount: Yup.number().required("totalAmount is required."),
   status: Yup.string().required("Status is required."),
 });
 
-const LoanManagement = () => {
+const GroupLoan = () => {
   const dispatch = useDispatch();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingLoan, setEditingLoan] = useState(null);
@@ -38,8 +35,9 @@ const LoanManagement = () => {
   const loans = useSelector((state) => state?.loan?.getAllLoans);
   const poses = useSelector((state) => state?.pos?.poses);
   const customers = useSelector((state) => state?.customer?.customers);
-  const loanproducts = useSelector((state) => state?.loanproduct?.loanproducts);
-  const grouploan = useSelector((state) => state?.grouploan?.grouploans);
+
+  console.log("customers", customers);
+
   const merchants = useSelector((state) => state?.merchant?.merchants);
   const loanAdded = useSelector((state) => state?.loan?.success?.addALoan);
   const loanUpdated = useSelector((state) => state?.loan?.success?.updateALoan);
@@ -55,18 +53,17 @@ const LoanManagement = () => {
   const formik = useFormik({
     initialValues: {
       merchantId: editingLoan?.merchantId || "",
-      customerId: editingLoan?.customerId || "",
-      loanProductId: editingLoan?.loanProductId || 0,
-      groupLoanId: editingLoan?.groupLoanId || 0,
-      posCode: editingLoan?.posCode || "",
-      amount: editingLoan?.amount || "",
+      loanProductId: editingLoan?.loanProductId || "",
+      groupId: editingLoan?.groupId || "",
+      totalAmount: editingLoan?.totalAmount || "",
       status: editingLoan?.status || "PENDING",
+      disbursedAt: editingLoan?.disbursedAt || new Date(),
     },
     enableReinitialize: true,
     validationSchema: LOAN_SCHEMA,
     onSubmit: (values) => {
       if (editingLoan) {
-        dispatch(updateALoan({ posCode: editingLoan.posCode, data: values }));
+        dispatch(updateALoan({ groupId: editingLoan.groupId, data: values }));
         dispatch(getAllPoses());
         dispatch(getAllMechants());
         dispatch(getAllCustomers());
@@ -111,10 +108,12 @@ const LoanManagement = () => {
   const columns = [
     { title: "#", dataIndex: "key" },
     { title: "Merchant ID", dataIndex: "merchantId" },
-    { title: "Customer ID", dataIndex: "customerId" },
-    { title: "POS Code", dataIndex: "posCode" },
-    { title: "Amount", dataIndex: "amount" },
+    { title: "Loan Product", dataIndex: "loanProductId" },
+    { title: "Group ", dataIndex: "groupId" },
+    { title: "totalAmount", dataIndex: "totalAmount" },
+    { title: "Disbursedment Date", dataIndex: "disbursedAt" },
     { title: "Status", dataIndex: "status" },
+
     {
       title: "Action",
       dataIndex: "action",
@@ -126,11 +125,10 @@ const LoanManagement = () => {
     loans.map((loan, index) => ({
       key: index + 1,
       merchantId: loan.merchantId,
-      customerId: loan.customerId,
-      loanProductId: loan?.loanProductId,
-      groupLoanId: loan?.groupLoanId,
-      posCode: loan.posCode,
-      amount: loan.amount,
+      loanProductId: loan.loanProductId,
+      groupId: loan.groupId,
+      totalAmount: loan.totalAmount,
+      disbursedAt: loan.disbursedAt,
       status: loan.status,
       action: (
         <div className="flex gap-4">
@@ -144,8 +142,8 @@ const LoanManagement = () => {
           </button>
           <button
             onClick={() => {
-              setSelectedLoanId(loan.posCode);
-              dispatch(deleteALoan(loan.posCode));
+              setSelectedLoanId(loan.groupId);
+              dispatch(deleteALoan(loan.groupId));
             }}
           >
             <RiDeleteBinLine className="text-red-500" />
@@ -159,7 +157,7 @@ const LoanManagement = () => {
       <div className="flex justify-between mb-4">
         <h2 className="text-xl font-bold">Loans</h2>
         <Button type="primary" onClick={showModal}>
-          + REQUEST LOAN
+          + GROUP LOAN
         </Button>
       </div>
 
@@ -216,46 +214,8 @@ const LoanManagement = () => {
             </div>
           </div>
           <div className="w-full flex flex-col">
-            <label htmlFor="customerId" className="text-sm font-semibold">
+            <label htmlFor="loanProductId" className="text-sm font-semibold">
               Customer
-            </label>
-            <Select
-              placeholder="Select Customer ."
-              type="text"
-              name="customerId"
-              id="customerId"
-              filterOption={(input, option) =>
-                (option?.label ?? "")
-                  .toLowerCase()
-                  .includes(input.toLowerCase())
-              }
-              options={
-                Array.isArray(poses)
-                  ? customers &&
-                    customers.map((customer) => ({
-                      value: customer.id,
-                      label: customer.fullName,
-                    }))
-                  : []
-              }
-              onBlur={formik.handleBlur}
-              onChange={(value) => formik.setFieldValue("customerId", value)}
-              value={formik.values.id}
-              className={`w-80 h-11 border-1.5 rounded-lg ${
-                formik.touched.customerId && formik.errors.customerId
-                  ? "border-red-600"
-                  : ""
-              }`}
-            />
-            <div>
-              <p className="text-xs text-red-600">
-                {formik.touched.customerId && formik.errors.customerId}
-              </p>
-            </div>
-          </div>
-          <div className="w-full flex flex-col">
-            <label htmlFor="customerId" className="text-sm font-semibold">
-              Loan Product
             </label>
             <Select
               placeholder="Select Customer ."
@@ -269,10 +229,10 @@ const LoanManagement = () => {
               }
               options={
                 Array.isArray(poses)
-                  ? loanproducts &&
-                    loanproducts.map((customer) => ({
+                  ? customers &&
+                    customers.map((customer) => ({
                       value: customer.id,
-                      label: customer.name,
+                      label: customer.fullName,
                     }))
                   : []
               }
@@ -292,14 +252,14 @@ const LoanManagement = () => {
             </div>
           </div>
           <div className="flex flex-col">
-            <label htmlFor="posCode" className="text-sm font-semibold">
-              PosCode
+            <label htmlFor="groupId" className="text-sm font-semibold">
+              groupId
             </label>
             <Select
-              placeholder="Select posCode ."
+              placeholder="Select groupId ."
               type="text"
-              name="posCode"
-              id="posCode"
+              name="groupId"
+              id="groupId"
               filterOption={(input, option) =>
                 (option?.label ?? "")
                   .toLowerCase()
@@ -309,30 +269,30 @@ const LoanManagement = () => {
                 Array.isArray(poses)
                   ? poses &&
                     poses.map((pos) => ({
-                      value: pos.posCode,
+                      value: pos.groupId,
                       label: pos.groupName,
                     }))
                   : []
               }
               onBlur={formik.handleBlur}
-              onChange={(value) => formik.setFieldValue("posCode", value)}
-              value={formik.values.posCode}
+              onChange={(value) => formik.setFieldValue("groupId", value)}
+              value={formik.values.groupId}
               className={`w-80 h-11 border-1.5 rounded-lg ${
-                formik.touched.posCode && formik.errors.posCode
+                formik.touched.groupId && formik.errors.groupId
                   ? "border-red-600"
                   : ""
               }`}
             />
             <div>
               <p className="text-xs text-red-600">
-                {formik.touched.posCode && formik.errors.posCode}
+                {formik.touched.groupId && formik.errors.groupId}
               </p>
             </div>
           </div>
           <Input
-            name="amount"
-            placeholder="Amount"
-            value={formik.values.amount}
+            name="totalAmount"
+            placeholder="totalAmount"
+            value={formik.values.totalAmount}
             onChange={formik.handleChange}
           />
           <Select
@@ -353,4 +313,4 @@ const LoanManagement = () => {
   );
 };
 
-export default LoanManagement;
+export default GroupLoan;

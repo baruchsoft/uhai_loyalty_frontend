@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -6,21 +7,31 @@ import { Button, Input } from "antd";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { resetAuthState, resetUserPassword,  } from "../features/auth/authSlice";
-
+import { resetAuthState, resetUserPassword } from "../features/auth/authSlice";
 
 const passwordRegex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?";:{}|<>\[\]])[A-Za-z\d!@#$%^&*(),.?";:{}|<>\[\]]{8,}$/;
 
 const SIGNIN_SCHEMA = Yup.object().shape({
-  password: Yup.string().matches(passwordRegex,"Password must include at least one lowercase letter, at least one uppercase letter, at least one number, at least one special character and at least 8 characters long.").required("Please provide your password."),
-  repeatPassword: Yup.string().matches(passwordRegex,"Password must include at least one lowercase letter, at least one uppercase letter, at least one number, at least one special character and at least 8 characters long.").oneOf([Yup.ref("password"), null], "Passwords must match.").required("Please repeat your password."),
+  password: Yup.string()
+    .matches(
+      passwordRegex,
+      "Password must include at least one lowercase letter, at least one uppercase letter, at least one number, at least one special character and at least 8 characters long."
+    )
+    .required("Please provide your password."),
+  repeatPassword: Yup.string()
+    .matches(
+      passwordRegex,
+      "Password must include at least one lowercase letter, at least one uppercase letter, at least one number, at least one special character and at least 8 characters long."
+    )
+    .oneOf([Yup.ref("password"), null], "Passwords must match.")
+    .required("Please repeat your password."),
 });
 
 const ResetPassword = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const location = useLocation()
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
 
@@ -32,19 +43,26 @@ const ResetPassword = () => {
     setShowRepeatPassword((prev) => !prev);
   };
 
-  const resetPasswordSuccess = useSelector((state) => state?.auth?.success?.resetUserPassword);
-  const resetPasswordLoading = useSelector((state) => state?.auth?.loading?.resetUserPassword);
+  const resetPasswordSuccess = useSelector(
+    (state) => state?.auth?.success?.resetUserPassword
+  );
+  const resetPasswordLoading = useSelector(
+    (state) => state?.auth?.loading?.resetUserPassword
+  );
 
   const formik = useFormik({
     initialValues: {
       password: "",
       repeatPassword: "",
-      email: location?.state?.email
+      email: location?.state?.email,
     },
     validationSchema: SIGNIN_SCHEMA,
     onSubmit: (values) => {
-    const passwords = {password: values.password, repeatPassword: values.repeatPassword};
-    dispatch(resetUserPassword({ passwords, email: values.email }));
+      const passwords = {
+        password: values.password,
+        repeatPassword: values.repeatPassword,
+      };
+      dispatch(resetUserPassword({ passwords, email: values.email }));
     },
   });
 
@@ -156,11 +174,26 @@ const ResetPassword = () => {
 
             {resetPasswordLoading ? (
               <div>
-                <Button type="primary" htmlType="button" loading className="w-80  h-11 mt-2 text-base  font-medium font-sans"> Please wait...</Button>
+                <Button
+                  type="primary"
+                  htmlType="button"
+                  loading
+                  className="w-80  h-11 mt-2 text-base  font-medium font-sans"
+                >
+                  {" "}
+                  Please wait...
+                </Button>
               </div>
             ) : (
               <div>
-                <Button type="primary" htmlType="submit" disabled={resetPasswordLoading} className="w-80  h-11 mt-2 text-base  font-medium font-sans">RESET PASSWORD</Button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={resetPasswordLoading}
+                  className="w-80  h-11 mt-2 text-base  font-medium font-sans"
+                >
+                  RESET PASSWORD
+                </Button>
               </div>
             )}
           </div>
