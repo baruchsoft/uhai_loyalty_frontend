@@ -33,7 +33,7 @@ const columns = [
 const phoneNumberRegex = /^(\+?[1-9]\d{1,14}|0\d{1,14})$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const idNumberRegex = /^[A-Za-z0-9\-\s]{5,20}$/;
-const hudumaNumberRegex = /^\d{8}$/;
+
 
 const POS_SCHEMA = Yup.object().shape({
   posName: Yup.string().required("Please provide point of sale name."),
@@ -61,7 +61,7 @@ const POS_SCHEMA = Yup.object().shape({
 
 const SIGNATORIES_SCHEMA  = Yup.object().shape({
   fullName: Yup.string().required("Please provide full name."),
-  idNumber: Yup.string().required("Please provide id number."),
+  idNumber: Yup.string().matches(idNumberRegex,"Please provide  valid id number.").required("Please provide id number."),
   nationality: Yup.string().required("Please select nationality."),
   designation: Yup.string().required("Please provide designation.")
 })
@@ -92,9 +92,25 @@ const Pos = () => {
   const addASignatoryLoading = useSelector((state)=>state?.pos?.loading?.addASignatory)
   const addASignatorySuccess = useSelector((state)=>state?.pos?.success?.addASignatory)
     
+
+
+   const  [openUploadDocumentsModal,setOpenUploadDocumentsModal] = useState(false)
+   const showUploadDocumentModal = useCallback(()=>{
+    setOpenUploadDocumentsModal(true)
+  })
+
+  const handleCloseUploadDocumentsModal = useCallback(()=>{
+    setOpenUploadDocumentsModal(false)
+    setSelectedPosCode(null)
+  })
+
+
+
   const showModal = useCallback(() => {
     setIsModalOpen(true);
   }, []);
+
+ 
 
   const handleCancel = useCallback(() => {
     setIsModalOpen(false);
@@ -116,6 +132,7 @@ const Pos = () => {
     const handleCloseSignatoriesModal = ()=>{
        setOpenSignatoriesModal(false)
        signatoriesFormik.resetForm()
+       setSelectedPosCode(null)
     }
 
   const showEditModal = async (pos) => {
@@ -233,7 +250,7 @@ const dataSource =
           {
             key: "2",
             label: (
-              <div style={{ display: "flex", gap: "10px" }}>
+              <div onClick={()=> {showUploadDocumentModal(); setSelectedPosCode(pos?.posCode)}} style={{ display: "flex", gap: "10px" }}>
                 <IoDocumentTextOutline style={{ width: "20px", height: "20px" }} className="text-grey-600 font-medium text-xl" />
                 <Typography style={{ fontSize: "14px", fontWeight: "400", textAlign: "start" }}>Upload Documents</Typography>
               </div>
@@ -982,6 +999,7 @@ const dataSource =
       </Modal>
 
 
+    {/* add signatories modal */}
       <Modal width={368} open={openSignatoriesModal} footer={null} onCancel={handleCloseSignatoriesModal}
        title={(<Typography style={{ fontSize:"18px", fontWeight:"600", textAlign:"start", color:"#333"}}>Add Signatories to this Group</Typography>)}>
       <form onSubmit={signatoriesFormik.handleSubmit}  >
@@ -1017,7 +1035,7 @@ const dataSource =
 
               <div className="flex flex-col gap-1">
                     <label htmlFor="idNumber" className="text-sm font-semibold">Id Number</label>
-                    <Input type="text" id="idNumber" name="idNumber"
+                    <Input type="number" id="idNumber" name="idNumber"
                       placeholder="National Id"
                       onBlur={signatoriesFormik.handleBlur}
                       onChange={signatoriesFormik.handleChange}
@@ -1093,6 +1111,31 @@ const dataSource =
         </div>
       </form>
       </Modal>
+
+
+      {/* upload documents to a group  */}
+      <Modal width={600} open={openUploadDocumentsModal} footer={null} onCancel={handleCloseUploadDocumentsModal}
+       title={(<Typography style={{ fontSize:"18px", fontWeight:"600", textAlign:"start", color:"#333"}}>Upload documents to this Group</Typography>)}>
+      <form onSubmit={signatoriesFormik.handleSubmit} style={{ marginTop:"20px"}}  >
+        <div style={{ display:"flex", flexDirection:"column", gap:"10px",}}>
+
+          <div style={{ display:"flex", flexDirection:"column", gap:"10px"}}>
+            <label htmlFor="docType">KRA PIN</label>
+            <div style={{ width:"100%",  borderRadius:"8px", border:"1px solid #9CA3AF", height:"60px", padding:"24px"}} >
+                   
+                
+          </div>
+          </div>
+
+            <div style={{ marginTop:"10px"}} className="flex items-center justify-between gap-8">
+              <Button htmlType="button" onClick={handleCloseUploadDocumentsModal} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+              <Button loading={addASignatoryLoading} type="primary" htmlType="submit" className="w-28 text-sm font-semibold h-10 text-white font-sans">Submit</Button>
+            </div>
+        </div>
+      </form>
+      </Modal>
+
+
 
     </div>
   );

@@ -35,8 +35,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="*" element={<NotFound />} />
-        <Route
-          path="/"
+        <Route path="/"
           element={
             <PublicRoutes>
               <Signin />
@@ -90,8 +89,8 @@ function App() {
           path="/"
           element={
             <PublicRoutes>
-              {" "}
-              <Signin />{" "}
+              
+              <Signin />
             </PublicRoutes>
           }
         />
