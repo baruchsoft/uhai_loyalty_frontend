@@ -198,8 +198,8 @@ const Pos = () => {
       } else {
         try {
           setAddingPos(true)
-          const response = await addPos() 
-          if(response.status === 200){
+          const response = await addPos(values) 
+          if(response.status === 201){
             toast.success("Group created successfully.")
             handleCancel()
             dispatch(resetPosState())
