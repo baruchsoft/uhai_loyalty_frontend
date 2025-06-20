@@ -296,7 +296,7 @@ const MainLayout = () => {
                   icon: (
                     <FaFileInvoice style={{ width: "16px", height: "16px" }} />
                   ),
-                  label: <p className="text-base font-medium">POS Types</p>,
+                  label: <p className="text-base font-medium">Pos Types</p>,
                 },
                 {
                   key: "pos",

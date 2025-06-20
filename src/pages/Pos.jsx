@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
-import {addAPos,addASignatory,deleteAPos,getAllPoses,getAPos,resetPosState,updateAPos} from "../features/pos/posSlice";
+import {addASignatory,deleteAPos,getAllPoses,getAPos,resetPosState} from "../features/pos/posSlice";
 import { getAllVillages } from "../features/village/villageSlice";
 import { getAllCampuses } from "../features/campus/campusSlice";
 import { getAllPosTypes } from "../features/posTypes/posTypeSlice";
@@ -17,6 +17,8 @@ import { MdOutlineEdit } from "react-icons/md";
 import { IoDocumentTextOutline } from "react-icons/io5";
 import dayjs from "dayjs";
 import { RiDeleteBinLine } from "react-icons/ri";
+import toast from "react-hot-toast";
+import { addPos, updatePos } from "../features/pos/posService";
 
 const columns = [
   { title: "#", dataIndex: "key",},
@@ -76,11 +78,7 @@ const Pos = () => {
   const [editingPos, setEditingPos] = useState(false);
   const getAllPosLoading = useSelector((state) => state?.pos?.loading?.getAllPoses);
   const poses = useSelector((state) => state?.pos?.poses);
-  const addAPosLoading = useSelector((state) => state?.pos?.loading?.addAPos);
-  const updateAPosLoading = useSelector((state) => state?.pos?.loading?.updateAPos);
   const deleteAPosLoading = useSelector((state) => state?.pos?.loading?.deleteAPos);
-  const addAPosSuccess = useSelector((state) => state?.pos?.success?.addAPos);
-  const updateAPosSuccess = useSelector((state) => state?.pos?.success?.updateAPos);
   const deleteAPosSuccess = useSelector((state) => state?.pos?.success?.deleteAPos);
   const posTypes = useSelector((state) => state?.posType?.posTypes);
   const villages = useSelector((state) => state?.village?.villages);
@@ -141,6 +139,9 @@ const Pos = () => {
     await dispatch(getAPos(pos?.posCode));
   };
 
+  const [addingPos,setAddingPos] = useState(false);
+  const [updateAPosLoading,setUpdateAPosLoading] = useState(false)
+
   const formik = useFormik({
     initialValues: {
       posName: editingPos?.posName || "",
@@ -167,11 +168,57 @@ const Pos = () => {
     },
     enableReinitialize: true,
     validationSchema: POS_SCHEMA,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       if (editingPos) {
-        dispatch(updateAPos({ posCode: editingPos?.posCode, posData: values,}));
+        try {
+          setUpdateAPosLoading(true);
+          const response = await updatePos({ posCode: editingPos?.posCode, posData: values,});
+          if(response.status === 200){
+            toast.success("Group updated successfully.")
+            handleCancel()
+            dispatch(resetPosState())
+            setEditingPos(null);
+            dispatch(getAllPoses());
+            setIsEditModalOpen(false);
+            dispatch(getAllPoses());
+            dispatch(getAllPosTypes());
+            dispatch(getAllVillages());
+            dispatch(getAllCampuses());
+            dispatch(getAllCounties());
+            dispatch(getAllConstituencies());
+            dispatch(getAllWards());
+            dispatch(getAllSubLocations());
+            dispatch(getAllVillages());
+          }
+        } catch (error) {
+          toast.error(error.response.data)
+        }finally{
+          setUpdateAPosLoading(false)
+        }
       } else {
-        dispatch(addAPos(values));
+        try {
+          setAddingPos(true)
+          const response = await addPos() 
+          if(response.status === 200){
+            toast.success("Group created successfully.")
+            handleCancel()
+            dispatch(resetPosState())
+            dispatch(getAllPoses())
+            setIsModalOpen(false);
+            dispatch(getAllPosTypes());
+            dispatch(getAllVillages());
+            dispatch(getAllCampuses());
+            dispatch(getAllCounties());
+            dispatch(getAllConstituencies());
+            dispatch(getAllWards());
+            dispatch(getAllSubLocations());
+            dispatch(getAllVillages());
+          }
+        } catch (error) {
+          toast.error(error?.response?.data?.message)
+        }finally{
+          setAddingPos(false)
+        }
       }
     },
   });
@@ -179,6 +226,7 @@ const Pos = () => {
   useEffect(() => {
     const fetchInitialData = async ()=>{
       await Promise.all([
+         dispatch(resetPosState()),
          dispatch(getAllPoses()),
          dispatch(getAllPosTypes()),
          dispatch(getAllVillages()),
@@ -192,45 +240,6 @@ const Pos = () => {
     }
    fetchInitialData()
   }, [dispatch]);
-
-  useEffect(() => {
-    if (addAPosSuccess) {
-      formik.resetForm();
-      dispatch(resetPosState())
-      dispatch(getAllPoses())
-      setIsModalOpen(false);
-      dispatch(getAllPosTypes());
-      dispatch(getAllVillages());
-      dispatch(getAllCampuses());
-      dispatch(getAllCounties());
-      dispatch(getAllConstituencies());
-      dispatch(getAllWards());
-      dispatch(getAllSubLocations());
-      dispatch(getAllVillages());
-    }
-  }, [addAPosSuccess,dispatch]);
-
-  useEffect(() => {
-    if (updateAPosSuccess) {
-      formik.resetForm();
-      dispatch(resetPosState())
-      setEditingPos(null);
-      dispatch(getAllPoses());
-      setIsEditModalOpen(false);
-      dispatch(getAllPoses());
-      dispatch(getAllPosTypes());
-      dispatch(getAllVillages());
-      dispatch(getAllCampuses());
-      dispatch(getAllCounties());
-      dispatch(getAllConstituencies());
-      dispatch(getAllWards());
-      dispatch(getAllSubLocations());
-      dispatch(getAllVillages());
-    }
-  }, [updateAPosSuccess,dispatch]);
-
-
-
 
 
  // Move the items array inside the dataSource mapping
@@ -970,7 +979,7 @@ const dataSource =
 
                   <div className="flex items-center justify-between  mt-4 ">
                       <Button onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingPos(null);}} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
-                      <Button type="primary" htmlType="submit" loading={ addAPosLoading || updateAPosLoading} disabled={addAPosLoading || updateAPosLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans" > {editingPos ? "Update" : "Continue"}</Button>
+                      <Button type="primary" htmlType="submit"  loading={ addingPos || updateAPosLoading} disabled={addingPos || updateAPosLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans" > {editingPos ? "Update" : "Continue"}</Button>
                   </div>
                 </div>
               </div>
@@ -1134,8 +1143,6 @@ const dataSource =
         </div>
       </form>
       </Modal>
-
-
 
     </div>
   );

@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import logo from "../assets/villagecan logo.png";
 import { Button, Input } from "antd";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { resetAuthState, signInUser } from "../features/auth/authSlice";
 import {jwtDecode} from "jwt-decode"
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import { getAUser } from "../features/user/userSlice";
+import { signIn } from "../features/auth/authService";
 
 const passwordRegex =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?";:{}|<>\[\]])[A-Za-z\d!@#$%^&*(),.?";:{}|<>\[\]]{8,}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -24,33 +24,27 @@ const Signin = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
-  const togglePasswordVisibility = () => {setShowPassword((prev) => !prev);};
+  const togglePasswordVisibility = () => {setShowPassword((prev) => !prev)};
+  const [isSubmitting,setIsubmitting] = useState(false)
 
-  const signInSuccess = useSelector((state) => state?.auth?.success?.signInUser);
-  const signInTokens = useSelector((state) => state?.auth?.signInTokens);
-  const signInLoading = useSelector((state) => state?.auth?.loading?.signInUser);
 
 
   const formik = useFormik({
-    initialValues: {
-      email: "",
-      password: "",
-    },
+    initialValues: {  email: "", password: "",},
     validationSchema: SIGNIN_SCHEMA,
-    onSubmit: (values) => {
-      dispatch(resetAuthState());
-      dispatch(signInUser(values));
-    },
-  });
-
-  useEffect(() => {
-    if (signInTokens && signInSuccess) {
-      formik.resetForm();
-      // decode the token to check if user is an admin
-      console.log(signInTokens.access_token,"=>accessToken")
+    onSubmit: async (values) => {
+      try {
+        setIsubmitting(true)
+        const response = await signIn(values);
+        if(response.status === 200){
+       formik.resetForm();
+        // decode the token to check if user is an admin
+        const accessToken = response.data.access_token
+        const refreshToken =response.data.refresh_token
+        console.log(accessToken,"=>accessToken")
       
-      if(signInTokens.access_token){
-        const decodedUser = jwtDecode(signInTokens.access_token);
+      if(accessToken){
+        const decodedUser = jwtDecode(accessToken);
         console.log(decodedUser, "=> decodedUser");
 
         // get the logged in user by user id
@@ -59,18 +53,23 @@ const Signin = () => {
           // store user Id in cookies
           Cookies.set("userId", decodedUser.userId, {expires:1, secure:true, sameSite:"strict"})
         }
-
         if(decodedUser.role === "Admin"){
           // store tokens in cookies
-        Cookies.set("accessToken", signInTokens.access_token, {expires: 1,secure: true, sameSite:"strict"});
-        Cookies.set("refreshToken", signInTokens.refresh_token, {expires: 1,secure: true, sameSite:"strict"});
+        Cookies.set("accessToken", accessToken, {expires: 1,secure: true, sameSite:"strict"});
+        Cookies.set("refreshToken", refreshToken, {expires: 1,secure: true, sameSite:"strict"});
         navigate("/admin")
         }else{
-         toast.error("Access Denied: You require admin privileges.")
+         toast.error("Not authorised.")
         }
+      } 
+        }
+      } catch (error) {
+       toast.error(error.response.data.message) 
+      }finally{
+        setIsubmitting(false)
       }
-    }
-  }, [signInSuccess, signInTokens]);
+    },
+  });
 
 
 // sm — Small screens (min-width: 640px)
@@ -132,7 +131,7 @@ const Signin = () => {
             <div className="flex cursor-pointer ml-48">
               <Button type="link" htmlType="button" onClick={() => navigate("/forgot-password")}className="text-sm font-medium  text-blue-600">Forgot password</Button>
             </div>
-             <Button loading={signInLoading} type="primary" htmlType="submit" disabled={signInLoading} className="w-80  h-11 mt-2 text-base  font-medium font-sans">Sign In</Button>
+             <Button loading={isSubmitting} type="primary" htmlType="submit" disabled={isSubmitting} className="w-80  h-11 mt-2 text-base  font-medium font-sans">Sign In</Button>
           </div>
         </form>
       </div>

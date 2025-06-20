@@ -2,16 +2,6 @@ import { createSlice, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 import posService from "./posService";
 
-export const addAPos = createAsyncThunk(
-  "pos/add-pos",
-  async (posData, thunkAPI) => {
-    try {
-      return await posService.addPos(posData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
 
 export const getAllPoses = createAsyncThunk(
   "pos/get-all-poses",
@@ -34,16 +24,6 @@ export const getAPos = createAsyncThunk(
   }
 );
 
-export const updateAPos = createAsyncThunk(
-  "pos/update-a-pos",
-  async ({ posCode, posData }, thunkAPI) => {
-    try {
-      return await posService.updatePos(posCode, posData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
 
 export const deleteAPos = createAsyncThunk(
   "pos/delete-a-pos",
@@ -70,10 +50,9 @@ export const resetPosState = createAction("Reset_all");
 const initialState = {
   poses: [],
   pos: null,
-  addedPos: null,
-  error: {addAPos: false,getAllPoses: false,getAPos: false,updateAPos: false,deleteAPos: false,addASignatory:false},
-  loading: {addAPos: false,getAllPoses: false,getAPos: false,updateAPos: false,deleteAPos: false, addASignatory:false},
-  success: {addAPos: false,getAllPoses: false,getAPos: false,updateAPos: false,deleteAPos: false, addASignatory:false},
+  error: {getAllPoses: false,getAPos: false,deleteAPos: false,addASignatory:false},
+  loading: {getAllPoses: false,getAPos: false,deleteAPos: false, addASignatory:false},
+  success: {getAllPoses: false,getAPos: false,deleteAPos: false, addASignatory:false},
   message: "",
 };
 export const posSlice = createSlice({
@@ -82,21 +61,6 @@ export const posSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(addAPos.pending, (state) => {
-        state.loading.addAPos = true;
-      })
-      .addCase(addAPos.fulfilled, (state, action) => {
-        state.loading.addAPos = false;
-        state.error.addAPos = false;
-        state.success.addAPos = true;
-        toast.success("Group created successfully.");
-      })
-      .addCase(addAPos.rejected, (state, action) => {
-        state.loading.addAPos = false;
-        state.error.addAPos = true;
-        state.success.addAPos = false;
-        toast.error(action?.payload?.response?.data?.header?.customerMessage)
-      })
       .addCase(getAllPoses.pending, (state) => {
         state.loading.getAllPoses = true;
       })
@@ -125,22 +89,6 @@ export const posSlice = createSlice({
         state.loading.getAPos = false;
         state.error.getAPos = true;
         state.success.getAPos = false;
-        state.message = action?.error;
-      })
-      .addCase(updateAPos.pending, (state) => {
-        state.loading.updateAPos = true;
-      })
-      .addCase(updateAPos.fulfilled, (state, action) => {
-        state.loading.updateAPos = false;
-        state.error.updateAPos = false;
-        state.success.updateAPos = true;
-        state.updatedPos = action?.payload;
-        toast.success("POS updated successfully.");
-      })
-      .addCase(updateAPos.rejected, (state, action) => {
-        state.loading.updateAPos = false;
-        state.error.updateAPos = true;
-        state.success.updateAPos = false;
         state.message = action?.error;
       })
       .addCase(deleteAPos.pending, (state) => {

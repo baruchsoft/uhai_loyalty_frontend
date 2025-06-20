@@ -1,9 +1,12 @@
 import { newRequest } from "../../utils/newRequest";
 
-const addPos = async (posData) => {
-  const response = await newRequest.post(`pos/create`, posData);
-  if (response && response.data) {
-    return response.data;
+ export const addPos = async (posData) => {
+  try {
+    const response = await newRequest.post(`pos/create`, posData);
+    return response;
+  } catch (error) {
+    console.log(error);
+    throw error;
   }
 };
 
@@ -21,12 +24,16 @@ const getPoses = async () => {
   }
 };
 
-const updatePos = async (posCode, posData) => {
-  const response = await newRequest.put(`pos/${posCode}`, posData);
-  if (response && response.data) {
-    return response.data;
+
+export const updatePos = async (posCode, posData) => {
+  try {
+      const response = await newRequest.put(`pos/${posCode}`, posData);
+      return response
+  } catch (error) {
+    console.log(error)
   }
 };
+
 
 const deletePos = async (posCode) => {
   const response = await newRequest.delete(`pos/${posCode}`);

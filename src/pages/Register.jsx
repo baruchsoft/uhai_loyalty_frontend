@@ -4,10 +4,11 @@ import * as Yup from "yup";
 import { Input, Button, Select } from "antd";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import logo from "../assets/villagecan logo.png";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { register } from "../features/auth/authService";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllCountries } from "../features/country/countrySlice";
-import { registerUser, resetAuthState } from "../features/auth/authSlice";
-import { useNavigate } from "react-router-dom";
 
 
 const passwordRegex =
@@ -29,16 +30,17 @@ const LOYALTY_SCHEMA = Yup.object().shape({
 });
 
 const Register = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate()
+  const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
-  const registerSuccess = useSelector((state) => state?.auth?.success?.registerUser);
-  const registerTokens = useSelector((state) => state?.auth?.registerTokens);
-  const registerLoading = useSelector( (state) => state?.auth?.loading?.registerUser);
-  const countries = useSelector((state) => state?.country?.countries);
+  const [isSubmitting,setIsubmitting] = useState(false)
+  const countriesList = useSelector((state)=>state?.country?.countries || []);
+  const loadingCountries = useSelector((state)=>state?.country?.loading?.getAllCountries);
+
+  console.log(countriesList,"=>list of all countries")
 
   const formik = useFormik({
     initialValues: {
@@ -54,22 +56,33 @@ const Register = () => {
       roleId: 1,
     },
     validationSchema: LOYALTY_SCHEMA,
-    onSubmit: (values) => {
-      dispatch(registerUser(values));
+    onSubmit: async (values) => {
+       try {
+        setIsubmitting(true)
+
+        const userUsername = `${values.userFirstname} ${values.userLastname}`
+        console.log(userUsername,"=>userName....")
+
+        const registrationData ={...values,userUsername:userUsername }
+ 
+        const response =  await register(registrationData);
+        if(response.status === 200){
+           toast.success("Your account has been successfully created.")
+           formik.resetForm();
+           navigate("/")
+        }
+      } catch (error) {
+        toast.error(error.response.data.message)
+      }finally{
+        setIsubmitting(false)
+      }
     },
   });
 
-  useEffect(() => {
-    dispatch(getAllCountries());
-  }, []);
+  useEffect(()=>{
+    dispatch(getAllCountries())
+  },[dispatch])
 
-  useEffect(() => {
-    if (registerTokens && registerSuccess) {
-      formik.resetForm();
-      navigate("/")
-      dispatch(resetAuthState());
-    }
-  }, [registerTokens,registerSuccess]);
 
 
   return (
@@ -198,15 +211,11 @@ const Register = () => {
                   </p>
                 </div>
               </div>
-              {registerLoading ? (
+            
                 <div className="hidden md:block">
-                  <Button type="primary" htmlType="button" loading className="w-80  h-11 mt-4 text-base font-medium font-sans"> Please wait...</Button>
+                  <Button type="primary"  loading={isSubmitting} htmlType="submit"  disabled={isSubmitting}  className="w-80  h-11 mt-4 text-base font-medium font-sans" >Register</Button>
                 </div>
-              ) : (
-                <div className="hidden md:block">
-                  <Button type="primary"  htmlType="submit"  disabled={registerLoading}  className="w-80  h-11 mt-4 text-base font-medium font-sans" >Register</Button>
-                </div>
-              )}
+              
             </div>
 
             <div className="flex flex-col items-center gap-2">
@@ -283,19 +292,17 @@ const Register = () => {
                   placeholder="Select Your Country"
                   name="userCountryCode"
                   id="userCountryCode"
+                  loading={loadingCountries}
                   filterOption={(input, option) =>
                     (option?.label ?? "")
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
                   options={
-                    Array.isArray(countries)
-                      ? countries &&
-                        countries.map((country) => ({
+                          countriesList.map((country) => ({
                           value: country.countryCode,
                           label: country.countryName,
                         }))
-                      : []
                   }
                   onBlur={formik.handleBlur}
                   onChange={(value) =>
@@ -356,15 +363,11 @@ const Register = () => {
                 </div>
               </div>
 
-              {registerLoading ? (
+            
                 <div className="block md:hidden">
-                  <Button type="primary" htmlType="button" loading className="w-80  h-11 mt-4 text-base font-medium font-sans">Please wait...</Button>
+                  <Button type="primary" htmlType="submit" loading={isSubmitting}  disabled={isSubmitting} className="w-80  h-11 mt-4 text-base font-medium font-sans">Register</Button>
                 </div>
-              ) : (
-                <div className="block md:hidden">
-                  <Button type="primary" htmlType="submit"  disabled={registerLoading} className="w-80  h-11 mt-4 text-base font-medium font-sans">Register</Button>
-                </div>
-              )}
+              
             </div>
           </div>
         </form>

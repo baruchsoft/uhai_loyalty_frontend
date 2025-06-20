@@ -1,27 +1,8 @@
 import { createSlice, createAsyncThunk, createAction } from "@reduxjs/toolkit";
 import authService from "./authService";
 import toast from "react-hot-toast";
-import Cookies from "js-cookie";
 
-// registration for admin
-export const registerUser = createAsyncThunk("auth/register", async(registerData, thunkAPI) =>{
-  try {
-    return await authService.register(registerData)
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error)
-  }
-})
 
-export const signInUser = createAsyncThunk(
-  "auth/signin",
-  async (signInData, thunkAPI) => {
-    try {
-      return await authService.signIn(signInData);
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error);
-    }
-  }
-);
 
 export const verifyUserEmail = createAsyncThunk(
   "auth/verify-user-email",
@@ -77,22 +58,6 @@ const authSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-     .addCase(registerUser.pending, (state) => {
-        state.loading.registerUser = true;
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.loading.registerUser = false;
-        state.success.registerUser = true;
-        state.error.registerUser = false;
-        state.registerTokens = action?.payload;
-        toast.success("Your account has been created successfully.")
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.loading.registerUser = false;
-        state.success.registerUser = false;
-        state.error.registerUser = true;
-        toast.error(action?.payload?.header?.customerMessage)
-      })
       .addCase(verifyUserEmail.pending, (state) => {
         state.loading.verifyUserEmail = true;
       })
@@ -111,24 +76,6 @@ const authSlice = createSlice({
         if (action?.payload?.response?.data?.message) {
           toast.error(action?.payload?.response?.data?.message);
         } 
-      })
-      .addCase(signInUser.pending, (state) => {
-        state.loading.signInUser = true;
-      })
-      .addCase(signInUser.fulfilled, (state, action) => {
-        state.loading.signInUser = false;
-        state.success.signInUser = true;
-        state.error.signInUser = false;
-        state.signInTokens = action?.payload;
-      })
-      .addCase(signInUser.rejected, (state, action) => {
-        state.loading.signInUser = false;
-        state.success.signInUser = false;
-        state.error.signInUser = true;
-        state.message = action?.payload?.response?.data?.message;
-        if (action?.payload?.response?.data?.message) {
-          toast.error(action?.payload?.response?.data?.message);
-        }
       })
       .addCase(verifyUserOtp.pending, (state) => {
         state.loading.verifyUserOtp = true;

@@ -685,12 +685,7 @@ const Universities = () => {
 
               <div className="flex items-center  gap-24 mt-4 ">
                 <Button htmlType="button" onClick={() => { handleCancel(); setIsEditModalOpen(false); setEditingUniversity(null)}} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
-
-                {addAUniversityLoading || updateAUniversityLoading ? (
-                  <Button type="primary" htmlType="button"loading  className="w-28 text-sm font-semibold h-10 text-white font-sans">  Please wait...  </Button>
-                ) : (
-                  <Button  type="primary" htmlType="submit"  disabled={addAUniversityLoading || updateAUniversityLoading}   className="w-28 text-sm font-semibold h-10 text-white font-sans" >{editingUniversity ? "Update" : "Submit"}</Button>
-                )}
+                <Button  type="primary" htmlType="submit"  loading={updateAUniversityLoading || addAUniversityLoading } disabled={addAUniversityLoading || updateAUniversityLoading}   className="w-28 text-sm font-semibold h-10 text-white font-sans" >{editingUniversity ? "Update" : "Submit"}</Button>
               </div>
 
               </div>
@@ -702,29 +697,10 @@ const Universities = () => {
       </Modal>
 
       <div>
-        {getAllUniversitiesLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined
-                  style={{
-                    fontSize: 40,
-                    color: "#000",
-                  }}
-                  spin
-                />
-              }
-            />
-          </div>
-        ) : (
           <div style={{ overflowX: "auto", width: "100%" }}>
-            <Table
-              columns={columns}
-              dataSource={dataSource}
-              scroll={{ x: "max-content" }}
+            <Table loading={getAllUniversitiesLoading} columns={columns} dataSource={dataSource}  scroll={{ x: "max-content" }}
             />
           </div>
-        )}
       </div>
 
       {/* Delete country modal */}
@@ -741,34 +717,8 @@ const Universities = () => {
         </div>
 
         <div className="flex items-center justify-end  mt-6  gap-8">
-          <Button
-            htmlType="button"
-            onClick={handleDeleteCancel}
-            className="w-28 text-sm font-semibold h-10 font-sans"
-          >
-            Cancel
-          </Button>
-
-          {deleteAUniversityLoading ? (
-            <Button
-              type="primary"
-              htmlType="button"
-              loading
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
-              Please wait...
-            </Button>
-          ) : (
-            <Button
-              onClick={deleteUniversity}
-              type="primary"
-              htmlType="button"
-              disabled={deleteAUniversityLoading}
-              className="w-28 text-sm font-semibold h-10 text-white font-sans"
-            >
-              Delete
-            </Button>
-          )}
+          <Button htmlType="button" onClick={handleDeleteCancel} className="w-28 text-sm font-semibold h-10 font-sans" > Cancel </Button>
+          <Button loading={deleteAUniversityLoading} onClick={deleteUniversity} type="primary"  htmlType="button" disabled={deleteAUniversityLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans"> Delete </Button>
         </div>
       </Modal>
     </div>

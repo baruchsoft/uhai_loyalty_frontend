@@ -649,12 +649,8 @@ const Campuses = () => {
                       </div>
 
                       <div className="flex items-center justify-between  mt-4 ">
-                        <Button htmlType="button"  onClick={() => { handleCancel();  setIsEditModalOpen(false); setEditingCampus(null);  }} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
-                        {addACampusLoading || updateACampusLoading ? (
-                          <Button type="primary"  htmlType="button"  loading  className="w-28 text-sm font-semibold h-10 text-white font-sans">Please wait...</Button>
-                        ) : (
-                          <Button  type="primary"  htmlType="submit"  disabled={addACampusLoading || updateACampusLoading}  className="w-28 text-sm font-semibold h-10 text-white font-sans">{editingCampus ? "Update" : "Submit"}</Button>
-                        )}
+                         <Button htmlType="button"  onClick={() => { handleCancel();  setIsEditModalOpen(false); setEditingCampus(null);  }} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+                          <Button  type="primary"  loading={updateACampusLoading || addACampusLoading } htmlType="submit"  disabled={addACampusLoading || updateACampusLoading}  className="w-28 text-sm font-semibold h-10 text-white font-sans">{editingCampus ? "Update" : "Submit"}</Button>
                       </div>
                   </div>
 
@@ -665,39 +661,18 @@ const Campuses = () => {
         </form>
       </Modal>
 
-      <div>
-        {getAllCampusesLoading ? (
-          <div className="flex flex-row items-center justify-center mt-20">
-            <Spin
-              indicator={
-                <Loading3QuartersOutlined
-                  style={{
-                    fontSize: 40,
-                    color: "#000",
-                  }}
-                  spin
-                />
-              }
-            />
-          </div>
-        ) : (
+    
           <div style={{ overflowX: "auto", width: "100%" }}>
-            <Table columns={columns} dataSource={dataSource} scroll={{ x: "max-content" }}/>
+            <Table loading={getAllCampusesLoading} columns={columns} dataSource={dataSource} scroll={{ x: "max-content" }}/>
           </div>
-        )}
-      </div>
-
+    
       {/* delete campus modal */}
 
       <Modal title="Confirm Campus deletion?" open={isDeleteModalOpen} footer={null} onCancel={handleDeleteModalCancel}>
         <p className="text-sm">  Are you sure you want to delete this campus?</p>
         <div className="flex items-center justify-end  mt-6  gap-8">
-          <Button htmlType="button"  onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
-          {deleteACampusLoading ? (
-            <Button  type="primary" htmlType="button" loading className="w-28 text-sm font-semibold h-10 text-white font-sans">Please wait... </Button>
-          ) : (
-            <Button onClick={deleteCampus} type="primary" htmlType="button" disabled={deleteACampusLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans">Delete</Button>
-          )}
+           <Button htmlType="button"  onClick={handleDeleteModalCancel} className="w-28 text-sm font-semibold h-10 font-sans">Cancel</Button>
+            <Button onClick={deleteCampus} loading={deleteACampusLoading} type="primary" htmlType="button" disabled={deleteACampusLoading} className="w-28 text-sm font-semibold h-10 text-white font-sans">Delete</Button>
         </div>
       </Modal>
     </div>
