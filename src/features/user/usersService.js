@@ -8,7 +8,7 @@ const addUser = async (userData) => {
 };
 
 const getUsers = async () => {
-  const response = await newRequest.get(`users/getAll?page=0&size=20`);
+  const response = await newRequest.get(`users/getAll?page=0&size=100`);
     if (response && response.data) {
     return response.data;
   }

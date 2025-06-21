@@ -18,7 +18,7 @@ const getPos = async (posCode) => {
 };
 
 const getPoses = async () => {
-  const response = await newRequest.get(`pos?page=0&size=20`);
+  const response = await newRequest.get(`pos?page=0&size=100`);
   if (response && response.data) {
     return response.data;
   }
