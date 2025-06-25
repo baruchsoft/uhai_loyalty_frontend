@@ -29,7 +29,6 @@ export const getGroupLoans = createAsyncThunk(
   async (thunkAPI) => {
     try {
       const merhcandstadata = await grouploanService.getGroupLoans();
-      console.log("merhcandstadata", merhcandstadata);
       return merhcandstadata;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -115,7 +114,7 @@ export const grouploanslice = createSlice({
         state.success.addGroupLoan = false;
         state.message = action?.error;
       })
-      .addCase(grouploanslice, () => initialState);
+      .addCase(resetgrouploan, () => initialState);
   },
 });
 

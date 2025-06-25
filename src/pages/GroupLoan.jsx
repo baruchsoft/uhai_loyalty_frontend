@@ -16,6 +16,11 @@ import { getAllPoses } from "../features/pos/posSlice";
 import { getAllMechants } from "../features/loans/merhcantSlice";
 import { getAllCustomers } from "../features/customers/customerSlice";
 import { RiDeleteBinLine } from "react-icons/ri";
+import {
+  addGroupLoan,
+  getGroupLoans,
+  updateGroupLoan,
+} from "../features/loans/grouploanSlice";
 
 const LOAN_SCHEMA = Yup.object().shape({
   merchantId: Yup.number().required("Merchant ID is required."),
@@ -32,11 +37,9 @@ const GroupLoan = () => {
   const [editingLoan, setEditingLoan] = useState(null);
   const [selectedLoanId, setSelectedLoanId] = useState(null);
 
-  const loans = useSelector((state) => state?.loan?.getAllLoans);
+  const loans = useSelector((state) => state?.grouploan?.grouploans);
   const poses = useSelector((state) => state?.pos?.poses);
   const customers = useSelector((state) => state?.customer?.customers);
-
-  console.log("customers", customers);
 
   const merchants = useSelector((state) => state?.merchant?.merchants);
   const loanAdded = useSelector((state) => state?.loan?.success?.addALoan);
@@ -63,13 +66,17 @@ const GroupLoan = () => {
     validationSchema: LOAN_SCHEMA,
     onSubmit: (values) => {
       if (editingLoan) {
-        dispatch(updateALoan({ groupId: editingLoan.groupId, data: values }));
+        dispatch(
+          updateGroupLoan({ groupId: editingLoan.groupId, data: values })
+        );
         dispatch(getAllPoses());
+        dispatch(getGroupLoans());
         dispatch(getAllMechants());
         dispatch(getAllCustomers());
       } else {
-        dispatch(addALoan(values));
+        dispatch(addGroupLoan(values));
         dispatch(getAllPoses());
+        dispatch(getGroupLoans());
         dispatch(getAllMechants());
         dispatch(getAllCustomers());
       }
@@ -77,7 +84,7 @@ const GroupLoan = () => {
   });
 
   useEffect(() => {
-    dispatch(getAllLoans());
+    dispatch(getGroupLoans());
     dispatch(getAllPoses());
     dispatch(getAllMechants());
     dispatch(getAllCustomers());
@@ -88,17 +95,17 @@ const GroupLoan = () => {
       formik.resetForm();
       closeModal();
       dispatch(resetLoanState());
-      dispatch(getAllLoans());
+      dispatch(getGroupLoans());
       dispatch(getAllPoses());
       dispatch(getAllMechants());
       dispatch(getAllCustomers());
     }
-  }, [loanAdded, loanUpdated, dispatch]);
+  }, [loanAdded, loanUpdated, dispatch, formik]);
 
   useEffect(() => {
     if (loanDeleted) {
       dispatch(resetLoanState());
-      dispatch(getAllLoans());
+      dispatch(getGroupLoans());
       dispatch(getAllPoses());
       dispatch(getAllMechants());
       dispatch(getAllCustomers());
@@ -120,37 +127,37 @@ const GroupLoan = () => {
     },
   ];
 
-  const dataSource =
-    Array.isArray(loans) &&
-    loans.map((loan, index) => ({
-      key: index + 1,
-      merchantId: loan.merchantId,
-      loanProductId: loan.loanProductId,
-      groupId: loan.groupId,
-      totalAmount: loan.totalAmount,
-      disbursedAt: loan.disbursedAt,
-      status: loan.status,
-      action: (
-        <div className="flex gap-4">
-          <button
-            onClick={() => {
-              setEditingLoan(loan);
-              setIsEditModalOpen(true);
-            }}
-          >
-            <MdOutlineEdit className="text-blue-500" />
-          </button>
-          <button
-            onClick={() => {
-              setSelectedLoanId(loan.groupId);
-              dispatch(deleteALoan(loan.groupId));
-            }}
-          >
-            <RiDeleteBinLine className="text-red-500" />
-          </button>
-        </div>
-      ),
-    }));
+  const dataSource = Array.isArray(loans)
+    ? loans.map((loan, index) => ({
+        key: index + 1,
+        merchantId: loan.merchantId,
+        loanProductId: loan.loanProductId,
+        groupId: loan.groupId,
+        totalAmount: loan.totalAmount,
+        disbursedAt: loan.disbursedAt,
+        status: loan.status,
+        action: (
+          <div className="flex gap-4">
+            <button
+              onClick={() => {
+                setEditingLoan(loan);
+                setIsEditModalOpen(true);
+              }}
+            >
+              <MdOutlineEdit className="text-blue-500" />
+            </button>
+            <button
+              onClick={() => {
+                setSelectedLoanId(loan.groupId);
+                dispatch(deleteALoan(loan.groupId));
+              }}
+            >
+              <RiDeleteBinLine className="text-red-500" />
+            </button>
+          </div>
+        ),
+      }))
+    : [];
 
   return (
     <div>
@@ -169,7 +176,7 @@ const GroupLoan = () => {
       <Table columns={columns} dataSource={dataSource} />
 
       <Modal
-        title={editingLoan ? "Edit Loan" : "Add Loan"}
+        title={editingLoan ? "Edit GROUP LOAN" : "Add GROUP LOAN"}
         open={isModalOpen || isEditModalOpen}
         onCancel={closeModal}
         footer={null}
@@ -200,7 +207,7 @@ const GroupLoan = () => {
               }
               onBlur={formik.handleBlur}
               onChange={(value) => formik.setFieldValue("merchantId", value)}
-              value={formik.values.id}
+              value={formik.values.merchantId}
               className={`w-80 h-11 border-1.5 rounded-lg ${
                 formik.touched.merchantId && formik.errors.merchantId
                   ? "border-red-600"
@@ -215,7 +222,7 @@ const GroupLoan = () => {
           </div>
           <div className="w-full flex flex-col">
             <label htmlFor="loanProductId" className="text-sm font-semibold">
-              Customer
+              Loan Product
             </label>
             <Select
               placeholder="Select Customer ."
@@ -238,7 +245,7 @@ const GroupLoan = () => {
               }
               onBlur={formik.handleBlur}
               onChange={(value) => formik.setFieldValue("loanProductId", value)}
-              value={formik.values.id}
+              value={formik.values.loanProductId}
               className={`w-80 h-11 border-1.5 rounded-lg ${
                 formik.touched.loanProductId && formik.errors.loanProductId
                   ? "border-red-600"
@@ -253,7 +260,7 @@ const GroupLoan = () => {
           </div>
           <div className="flex flex-col">
             <label htmlFor="groupId" className="text-sm font-semibold">
-              groupId
+              Group
             </label>
             <Select
               placeholder="Select groupId ."
@@ -269,7 +276,7 @@ const GroupLoan = () => {
                 Array.isArray(poses)
                   ? poses &&
                     poses.map((pos) => ({
-                      value: pos.groupId,
+                      value: pos.posCode,
                       label: pos.groupName,
                     }))
                   : []
@@ -305,7 +312,7 @@ const GroupLoan = () => {
             ]}
           />
           <Button type="primary" htmlType="submit" className="mt-4">
-            {editingLoan ? "Update Loan" : "Add Loan"}
+            {editingLoan ? "Update GROUP LOAN" : "Add GROUP LOAN"}
           </Button>
         </form>
       </Modal>

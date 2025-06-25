@@ -22,6 +22,9 @@ import accountReducer from "../features/loans/accountSlice";
 import SignatoryReducer from "../features/loans/signatorySlice";
 import loanproductReducer from "../features/loans/loanproductSlice";
 import grouploanReducer from "../features/loans/grouploanSlice";
+import grouploanrepaymentReducer from "../features/loans/groupRepaymentSlice";
+import loanrepaymentReducer from "../features/loans/repaymentSlice";
+
 const persistConfig = {
   key: "root",
   storage,
@@ -50,6 +53,8 @@ const rootReducer = combineReducers({
   signatory: SignatoryReducer,
   loanproduct: loanproductReducer,
   grouploan: grouploanReducer,
+  grouploanrepayment: grouploanrepaymentReducer,
+  repayment: loanrepaymentReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -57,7 +62,6 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const store = configureStore({
   reducer: persistedReducer,
   devTools: import.meta.env.VITE_APP_NODE_ENV !== "production",
-
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {

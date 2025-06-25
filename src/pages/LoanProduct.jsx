@@ -17,6 +17,11 @@ import { getAllMechants } from "../features/loans/merhcantSlice";
 import { getAllCustomers } from "../features/customers/customerSlice";
 import { RiDeleteBinLine } from "react-icons/ri";
 import TextArea from "antd/es/input/TextArea";
+import {
+  getLoanProducts,
+  addLoanProduct,
+  updateLoanProduct,
+} from "../features/loans/loanproductSlice";
 
 const LOAN_SCHEMA = Yup.object().shape({
   description: Yup.number().required("Merchant ID is required."),
@@ -34,7 +39,7 @@ const LoanProduct = () => {
   const [editingLoan, setEditingLoan] = useState(null);
   const [selectedLoanId, setSelectedLoanId] = useState(null);
 
-  const loans = useSelector((state) => state?.loan?.getAllLoans);
+  const loans = useSelector((state) => state?.loanproduct?.getLoanProducts);
   const poses = useSelector((state) => state?.pos?.poses);
   const customers = useSelector((state) => state?.customer?.customers);
   const loanproducts = useSelector((state) => state?.loanproduct?.loanproducts);
@@ -42,9 +47,15 @@ const LoanProduct = () => {
   console.log("customers", customers);
 
   const merchants = useSelector((state) => state?.merchant?.merchants);
-  const loanAdded = useSelector((state) => state?.loan?.success?.addALoan);
-  const loanUpdated = useSelector((state) => state?.loan?.success?.updateALoan);
-  const loanDeleted = useSelector((state) => state?.loan?.success?.deleteALoan);
+  const loanAdded = useSelector(
+    (state) => state?.loanproduct?.success?.addLoanProduct
+  );
+  const loanUpdated = useSelector(
+    (state) => state?.loanproduct?.success?.updateALoan
+  );
+  const loanDeleted = useSelector(
+    (state) => state?.loanproduct?.success?.deleteALoan
+  );
 
   const showModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -65,12 +76,12 @@ const LoanProduct = () => {
     validationSchema: LOAN_SCHEMA,
     onSubmit: (values) => {
       if (editingLoan) {
-        dispatch(updateALoan({ name: editingLoan.name, data: values }));
+        dispatch(updateLoanProduct({ name: editingLoan.name, data: values }));
         dispatch(getAllPoses());
         dispatch(getAllMechants());
         dispatch(getAllCustomers());
       } else {
-        dispatch(addALoan(values));
+        dispatch(addLoanProduct(values));
         dispatch(getAllPoses());
         dispatch(getAllMechants());
         dispatch(getAllCustomers());
@@ -79,7 +90,7 @@ const LoanProduct = () => {
   });
 
   useEffect(() => {
-    dispatch(getAllLoans());
+    dispatch(getLoanProducts());
     dispatch(getAllPoses());
     dispatch(getAllMechants());
     dispatch(getAllCustomers());
@@ -90,7 +101,7 @@ const LoanProduct = () => {
       formik.resetForm();
       closeModal();
       dispatch(resetLoanState());
-      dispatch(getAllLoans());
+      dispatch(getLoanProducts());
       dispatch(getAllPoses());
       dispatch(getAllMechants());
       dispatch(getAllCustomers());
@@ -100,7 +111,7 @@ const LoanProduct = () => {
   useEffect(() => {
     if (loanDeleted) {
       dispatch(resetLoanState());
-      dispatch(getAllLoans());
+      dispatch(getLoanProducts());
       dispatch(getAllPoses());
       dispatch(getAllMechants());
       dispatch(getAllCustomers());
@@ -168,7 +179,7 @@ const LoanProduct = () => {
       <Table columns={columns} dataSource={dataSource} />
 
       <Modal
-        title={editingLoan ? "Edit Loan" : "Add Loan"}
+        title={editingLoan ? "Edit  Loan Product" : "Add  Loan Product"}
         open={isModalOpen || isEditModalOpen}
         onCancel={closeModal}
         footer={null}
@@ -184,11 +195,13 @@ const LoanProduct = () => {
             name="description"
             placeholder="description"
             value={formik.values.description}
+            onChange={formik.handleChange}
           />
           <TextArea
             name="shortDesc"
             placeholder="shortDesc"
             value={formik.values.shortDesc}
+            onChange={formik.handleChange}
           />
           <Input
             name="interestRate"
@@ -206,7 +219,7 @@ const LoanProduct = () => {
             ]}
           />
           <Button type="primary" htmlType="submit" className="mt-4">
-            {editingLoan ? "Update Loan" : "Add Loan"}
+            {editingLoan ? "Update  Loan Product" : "Add  Loan Product"}
           </Button>
         </form>
       </Modal>

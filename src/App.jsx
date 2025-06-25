@@ -29,6 +29,10 @@ import Merchants from "./pages/Merchants";
 import Accounts from "./pages/Accounts";
 import LoanManagement from "./pages/Loan";
 import MerchantRegistration from "./pages/MerchantRegistration.jsx";
+import LoanProduct from "./pages/LoanProduct.jsx";
+import GroupLoan from "./pages/GroupLoan.jsx";
+import GroupRepayment from "./pages/GroupRepayment.jsx";
+import LoanRepaymentForm from "./pages/LoanRepaymentForm.jsx";
 
 function App() {
   return (
@@ -149,8 +153,14 @@ function App() {
           <Route path="pos-types" element={<PosTypes />} />
           <Route path="pos" element={<Pos />} />
           <Route path="merchants" element={<Merchants />} />
+          <Route path="products" element={<LoanProduct />} />
           <Route path="accounts" element={<Accounts />} />
           <Route path="loans" element={<LoanManagement />} />
+          <Route path="loanrepayment" element={<LoanRepaymentForm />} />
+
+          <Route path="grouploan" element={<GroupLoan />} />
+          <Route path="grouploanrepayment" element={<GroupRepayment />} />
+
           <Route
             path="loans/merchants/create-merchant"
             element={<MerchantRegistration mode="create" />}

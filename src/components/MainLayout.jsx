@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
-import { Avatar, Button, Layout, Menu, theme,Card , Input} from "antd";
+import { Avatar, Button, Layout, Menu, theme, Card, Input } from "antd";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { MdMapsHomeWork } from "react-icons/md";
 import { FaKey } from "react-icons/fa";
@@ -26,7 +26,7 @@ import { MdPointOfSale } from "react-icons/md";
 import { FaFileInvoice } from "react-icons/fa6";
 import Cookies from "js-cookie";
 import { MdLoyalty } from "react-icons/md";
-import {jwtDecode} from "jwt-decode"
+import { jwtDecode } from "jwt-decode";
 import { useDispatch, useSelector } from "react-redux";
 import { getAUser } from "../features/user/userSlice";
 
@@ -37,13 +37,15 @@ const { Header, Sider, Content } = Layout;
 
 const MainLayout = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  const { token: { colorBgContainer, borderRadiusLG }} = theme.useToken();
-  const [decodedUser, setDecodedUser] = useState(null)
-  const [seletedKey,setSelectedKey] = useState("dashboard")
-  const location = useLocation()
+  const {
+    token: { colorBgContainer, borderRadiusLG },
+  } = theme.useToken();
+  const [decodedUser, setDecodedUser] = useState(null);
+  const [seletedKey, setSelectedKey] = useState("dashboard");
+  const location = useLocation();
 
   const handleResize = () => {
     if (window.innerWidth < 768) {
@@ -53,41 +55,39 @@ const MainLayout = () => {
     }
   };
 
-
-  useEffect(()=>{
-    const pathSegments = location.pathname.split("/")
-    const currentPath = pathSegments[2]
-    setSelectedKey(currentPath)
-  },[location.pathname])
+  useEffect(() => {
+    const pathSegments = location.pathname.split("/");
+    const currentPath = pathSegments[2];
+    setSelectedKey(currentPath);
+  }, [location.pathname]);
 
   useEffect(() => {
-    if(window.location.pathname === "/admin"){
-    navigate("dashboard")
+    if (window.location.pathname === "/admin") {
+      navigate("dashboard");
     }
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => {
-    window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     const accessToken = Cookies.get("accessToken");
-    console.log(accessToken,"=> accessToken");
+    console.log(accessToken, "=> accessToken");
 
-    if(accessToken){
-      const decodedUser = jwtDecode(accessToken)
-      setDecodedUser(decodedUser)
-      console.log(decodedUser)
+    if (accessToken) {
+      const decodedUser = jwtDecode(accessToken);
+      setDecodedUser(decodedUser);
+      console.log(decodedUser);
     }
-  },[])
+  }, []);
 
-  useEffect(()=>{
-    if(decodedUser?.userId){
-     dispatch(getAUser(decodedUser?.userId))
-   }
-  },[decodedUser?.userId])
-
+  useEffect(() => {
+    if (decodedUser?.userId) {
+      dispatch(getAUser(decodedUser?.userId));
+    }
+  }, [decodedUser?.userId]);
 
   const handleLogout = () => {
     Cookies.remove("accessToken");
@@ -95,13 +95,17 @@ const MainLayout = () => {
     window.location.reload();
   };
 
- const currentUser = useSelector((state)=>state?.user?.user);
- console.log(currentUser,"...=>currentUser")
-
+  const currentUser = useSelector((state) => state?.user?.user);
+  console.log(currentUser, "...=>currentUser");
 
   return (
     <Layout>
-      <Sider trigger={null} collapsible collapsed={collapsed} className="bg-white">
+      <Sider
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+        className="bg-white"
+      >
         <div className="flex items-center justify-center h-16 bg-blue-600">
           {!collapsed ? (
             <div
@@ -110,8 +114,20 @@ const MainLayout = () => {
             >
               <p className="text-white text-xl font-bold">VillageCAN</p>
               <Card
-                style={{margin: "4px",width: "72px",height: "20px",display: "flex",alignItems: "center",justifyContent: "center",borderRadius: "4px", }}  >
-                <p style={{ fontSize: "14px", fontWeight: "600" }}> {decodedUser?.role}</p>
+                style={{
+                  margin: "4px",
+                  width: "72px",
+                  height: "20px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "4px",
+                }}
+              >
+                <p style={{ fontSize: "14px", fontWeight: "600" }}>
+                  {" "}
+                  {decodedUser?.role}
+                </p>
               </Card>
             </div>
           ) : (
@@ -131,13 +147,33 @@ const MainLayout = () => {
           items={[
             {
               key: "user-profile",
-              icon: (<FaUser style={{ width: "16px", height: "16px", fontWeight: "800", fontSize: "30px" }} />),
-              label: (<p className="text-base font-medium cursor-pointer">Welcome { currentUser && currentUser?.firstname}</p>),
+              icon: (
+                <FaUser
+                  style={{
+                    width: "16px",
+                    height: "16px",
+                    fontWeight: "800",
+                    fontSize: "30px",
+                  }}
+                />
+              ),
+              label: (
+                <p className="text-base font-medium cursor-pointer">
+                  Welcome {currentUser && currentUser?.firstname}
+                </p>
+              ),
             },
             {
               key: "dashboard",
               icon: (
-                <MdMapsHomeWork style={{ width: "16px", height: "16px",fontWeight: "800",fontSize: "30px",}}/>
+                <MdMapsHomeWork
+                  style={{
+                    width: "16px",
+                    height: "16px",
+                    fontWeight: "800",
+                    fontSize: "30px",
+                  }}
+                />
               ),
               label: <p className="text-base font-medium">Dashboard</p>,
             },
@@ -202,7 +238,9 @@ const MainLayout = () => {
 
             {
               key: "location Setups",
-              icon: <FaLocationPinLock style={{ width: "16px", height: "16px" }} />,
+              icon: (
+                <FaLocationPinLock style={{ width: "16px", height: "16px" }} />
+              ),
               label: <p className="text-base font-medium">Location Setups</p>,
               children: [
                 {
@@ -224,7 +262,9 @@ const MainLayout = () => {
                   icon: (
                     <FaMapMarked style={{ width: "16px", height: "16px" }} />
                   ),
-                  label: <p className="text-base font-medium">Constituencies</p>,
+                  label: (
+                    <p className="text-base font-medium">Constituencies</p>
+                  ),
                 },
                 {
                   key: "wards",
@@ -286,9 +326,7 @@ const MainLayout = () => {
 
             {
               key: "Pos setups",
-              icon: (
-                <MdPointOfSale style={{ width: "16px", height: "16px" }} />
-              ),
+              icon: <MdPointOfSale style={{ width: "16px", height: "16px" }} />,
               label: <p className="text-base font-medium">Group Setups</p>,
               children: [
                 {
@@ -310,8 +348,15 @@ const MainLayout = () => {
             {
               key: "Loan Management",
               icon: <MdPointOfSale style={{ width: "16px", height: "16px" }} />,
-              label: <p className="text-base font-medium">Loan Management</p>,
+              label: <p className="text-base font-medium">Loan Setup</p>,
               children: [
+                {
+                  key: "products",
+                  icon: (
+                    <FaFileInvoice style={{ width: "16px", height: "16px" }} />
+                  ),
+                  label: <p className="text-base font-medium">Loan Product</p>,
+                },
                 {
                   key: "merchants",
                   icon: (
@@ -326,6 +371,25 @@ const MainLayout = () => {
                   ),
                   label: <p className="text-base font-medium">Accounts</p>,
                 },
+
+                {
+                  key: "grouploan",
+                  icon: (
+                    <TiShoppingCart style={{ width: "16px", height: "16px" }} />
+                  ),
+                  label: <p className="text-base font-medium">Group Loan</p>,
+                },
+                {
+                  key: "grouploanrepayment",
+                  icon: (
+                    <TiShoppingCart style={{ width: "16px", height: "16px" }} />
+                  ),
+                  label: (
+                    <p className="text-base font-medium">
+                      Group Loan Repayment
+                    </p>
+                  ),
+                },
                 {
                   key: "loans",
                   icon: (
@@ -333,12 +397,20 @@ const MainLayout = () => {
                   ),
                   label: <p className="text-base font-medium">Loans</p>,
                 },
+                {
+                  key: "loanrepayment",
+                  icon: (
+                    <TiShoppingCart style={{ width: "16px", height: "16px" }} />
+                  ),
+                  label: (
+                    <p className="text-base font-medium">Loan Repayment</p>
+                  ),
+                },
               ],
             },
           ]}
         />
       </Sider>
-
 
       <Layout>
         <Header
@@ -375,8 +447,21 @@ const MainLayout = () => {
                 <IoNotifications className="text-lg cursor-pointer" />
               </div>
               <div className="flex flex-row gap-1  items-center">
-                <Avatar style={{cursor:"pointer"}} size={36}icon={<UserOutlined />} onClick={() => setOpen(!open)} className="shrink-0"/>
-                <button type="button" className="text-sm cursor-pointer font-medium" onClick={() => setOpen(!open)}>{ currentUser && `${currentUser?.firstname}  ${currentUser?.lastname}`}</button>
+                <Avatar
+                  style={{ cursor: "pointer" }}
+                  size={36}
+                  icon={<UserOutlined />}
+                  onClick={() => setOpen(!open)}
+                  className="shrink-0"
+                />
+                <button
+                  type="button"
+                  className="text-sm cursor-pointer font-medium"
+                  onClick={() => setOpen(!open)}
+                >
+                  {currentUser &&
+                    `${currentUser?.firstname}  ${currentUser?.lastname}`}
+                </button>
               </div>
             </div>
           </div>
@@ -404,7 +489,14 @@ const MainLayout = () => {
             >
               Edit profile
             </button>
-            <button type="button"onClick={() => {handleLogout(); setOpen(!open);}} className="m-0 p-0 font-normal text-sm text-black font-sans hover:text-blue-600">
+            <button
+              type="button"
+              onClick={() => {
+                handleLogout();
+                setOpen(!open);
+              }}
+              className="m-0 p-0 font-normal text-sm text-black font-sans hover:text-blue-600"
+            >
               Logout
             </button>
           </div>

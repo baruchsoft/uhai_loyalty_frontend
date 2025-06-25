@@ -114,7 +114,7 @@ export const loanproductSlice = createSlice({
         state.success.addLoanProduct = false;
         state.message = action?.error;
       })
-      .addCase(loanproductSlice, () => initialState);
+      .addCase(resetloanProduct, () => initialState);
   },
 });
 
