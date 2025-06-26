@@ -15,6 +15,20 @@ export const addGroupRepayment = createAsyncThunk(
   }
 );
 
+export const updateGroupRepayment = createAsyncThunk(
+  "groupRepayment/addGroupRepayment",
+  async (repaymentData, { rejectWithValue }) => {
+    try {
+      const response = await groupRepaymentService.addGroupRepayment(
+        repaymentData
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 export const getGroupRepayments = createAsyncThunk(
   "groupRepayment/getGroupRepayments",
   async (_, { rejectWithValue }) => {
@@ -35,10 +49,20 @@ const groupRepaymentSlice = createSlice({
     error: null,
     success: null,
   },
+  // reducers: {
+  //   resetRepaymentState: (state) => {
+  //     state.error = null;
+  //     state.success = null;
+  //   },
+  // },
   reducers: {
     resetRepaymentState: (state) => {
+      state.loan = null;
+      state.success = {
+        addGroupRepayment: false,
+        updateGroupRepayment: false,
+      };
       state.error = null;
-      state.success = null;
     },
   },
   extraReducers: (builder) => {

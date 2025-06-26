@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import accountService from "./accountService";
+import toast from "react-hot-toast";
 
 export const getAllAccounts = createAsyncThunk(
   "account/getAll",
@@ -80,6 +81,7 @@ export const accountSlice = createSlice({
   initialState,
   reducers: {
     resetAccountState: (state) => {
+      state.account = null;
       state.success = {
         addAccount: false,
         updateAccount: false,
@@ -119,6 +121,8 @@ export const accountSlice = createSlice({
       .addCase(addAccount.fulfilled, (state, action) => {
         state.loading.addAccount = false;
         state.success.addAccount = true;
+        state.accounts.push(action.payload);
+        toast.success("Account added successfully.");
       })
       .addCase(addAccount.rejected, (state, action) => {
         state.loading.addAccount = false;

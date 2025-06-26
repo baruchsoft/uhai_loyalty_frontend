@@ -30,8 +30,9 @@ const GroupRepayment = () => {
   const repayments = useSelector(
     (state) => state?.repayment?.groupRepayments || []
   );
+  const accounts = useSelector((state) => state?.account?.accounts);
   const merchants = useSelector((state) => state?.merchant?.merchants);
-  const poses = useSelector((state) => state?.pos?.poses); // groups
+  const poses = useSelector((state) => state?.pos?.poses);
 
   useEffect(() => {
     dispatch(getGroupLoans());
@@ -189,11 +190,17 @@ const GroupRepayment = () => {
 
           <div>
             <label className="text-sm font-medium">From Account</label>
-            <Input
-              name="fromAccount"
+            <Select
+              placeholder="Select From Account"
+              options={
+                accounts?.map((merchant) => ({
+                  value: merchant.id,
+                  label: merchant.accountName,
+                })) || []
+              }
               value={formik.values.fromAccount}
-              onChange={formik.handleChange}
-              type="number"
+              onChange={(value) => formik.setFieldValue("fromAccount", value)}
+              className="w-full"
             />
             {formik.touched.fromAccount && formik.errors.fromAccount && (
               <p className="text-xs text-red-500">
@@ -201,14 +208,19 @@ const GroupRepayment = () => {
               </p>
             )}
           </div>
-
           <div>
             <label className="text-sm font-medium">To Account</label>
-            <Input
-              name="toAccount"
+            <Select
+              placeholder="Select To Account"
+              options={
+                accounts?.map((merchant) => ({
+                  value: merchant.id,
+                  label: merchant.accountName,
+                })) || []
+              }
               value={formik.values.toAccount}
-              onChange={formik.handleChange}
-              type="number"
+              onChange={(value) => formik.setFieldValue("toAccount", value)}
+              className="w-full"
             />
             {formik.touched.toAccount && formik.errors.toAccount && (
               <p className="text-xs text-red-500">{formik.errors.toAccount}</p>

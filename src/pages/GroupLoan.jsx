@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useCallback, useEffect, useState } from "react";
 import * as Yup from "yup";
-import { Button, Input, Modal, Spin, Table, Select } from "antd";
+import { Button, Input, Modal, Spin, Table, Select, DatePicker } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import { MdDelete, MdOutlineEdit } from "react-icons/md";
@@ -21,6 +21,7 @@ import {
   getGroupLoans,
   updateGroupLoan,
 } from "../features/loans/grouploanSlice";
+import dayjs from "dayjs";
 
 const LOAN_SCHEMA = Yup.object().shape({
   merchantId: Yup.number().required("Merchant ID is required."),
@@ -38,6 +39,8 @@ const GroupLoan = () => {
   const [selectedLoanId, setSelectedLoanId] = useState(null);
 
   const loans = useSelector((state) => state?.grouploan?.grouploans);
+  const loanproducts = useSelector((state) => state?.loanproduct?.loanproducts);
+
   const poses = useSelector((state) => state?.pos?.poses);
   const customers = useSelector((state) => state?.customer?.customers);
 
@@ -197,7 +200,7 @@ const GroupLoan = () => {
                   .includes(input.toLowerCase())
               }
               options={
-                Array.isArray(poses)
+                Array.isArray(merchants)
                   ? merchants &&
                     merchants.map((merchant) => ({
                       value: merchant.id,
@@ -208,10 +211,10 @@ const GroupLoan = () => {
               onBlur={formik.handleBlur}
               onChange={(value) => formik.setFieldValue("merchantId", value)}
               value={formik.values.merchantId}
-              className={`w-80 h-11 border-1.5 rounded-lg ${
+              className={`w-full${
                 formik.touched.merchantId && formik.errors.merchantId
                   ? "border-red-600"
-                  : ""
+                  : "w-full"
               }`}
             />
             <div>
@@ -219,6 +222,21 @@ const GroupLoan = () => {
                 {formik.touched.merchantId && formik.errors.merchantId}
               </p>
             </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium">DisbursedAt</label>
+            <DatePicker
+              className="w-full"
+              value={dayjs(formik.values.disbursedAt)}
+              onChange={(date) =>
+                formik.setFieldValue("disbursedAt", date?.toISOString())
+              }
+            />
+            {formik.touched.disbursedAt && formik.errors.disbursedAt && (
+              <p className="text-xs text-red-500">
+                {formik.errors.disbursedAt}
+              </p>
+            )}
           </div>
           <div className="w-full flex flex-col">
             <label htmlFor="loanProductId" className="text-sm font-semibold">
@@ -235,21 +253,21 @@ const GroupLoan = () => {
                   .includes(input.toLowerCase())
               }
               options={
-                Array.isArray(poses)
-                  ? customers &&
-                    customers.map((customer) => ({
+                Array.isArray(loanproducts)
+                  ? loanproducts &&
+                    loanproducts.map((customer) => ({
                       value: customer.id,
-                      label: customer.fullName,
+                      label: customer.name,
                     }))
                   : []
               }
               onBlur={formik.handleBlur}
               onChange={(value) => formik.setFieldValue("loanProductId", value)}
               value={formik.values.loanProductId}
-              className={`w-80 h-11 border-1.5 rounded-lg ${
+              className={`w-full ${
                 formik.touched.loanProductId && formik.errors.loanProductId
                   ? "border-red-600"
-                  : ""
+                  : "w-full"
               }`}
             />
             <div>
@@ -284,10 +302,10 @@ const GroupLoan = () => {
               onBlur={formik.handleBlur}
               onChange={(value) => formik.setFieldValue("groupId", value)}
               value={formik.values.groupId}
-              className={`w-80 h-11 border-1.5 rounded-lg ${
+              className={`w-full ${
                 formik.touched.groupId && formik.errors.groupId
                   ? "border-red-600"
-                  : ""
+                  : "w-full"
               }`}
             />
             <div>

@@ -24,9 +24,9 @@ import {
 } from "../features/loans/loanproductSlice";
 
 const LOAN_SCHEMA = Yup.object().shape({
-  description: Yup.number().required("Merchant ID is required."),
-  shortDesc: Yup.number().required("Customer ID is required."),
-  name: Yup.number().required("POS Code is required."),
+  description: Yup.string().required("Merchant ID is required."),
+  shortDesc: Yup.string().required("Customer ID is required."),
+  name: Yup.string().required("POS Code is required."),
   interestRate: Yup.number().required("interestRate is required."),
   status: Yup.string().required("Status is required."),
 });
@@ -39,19 +39,15 @@ const LoanProduct = () => {
   const [editingLoan, setEditingLoan] = useState(null);
   const [selectedLoanId, setSelectedLoanId] = useState(null);
 
-  const loans = useSelector((state) => state?.loanproduct?.getLoanProducts);
-  const poses = useSelector((state) => state?.pos?.poses);
-  const customers = useSelector((state) => state?.customer?.customers);
-  const loanproducts = useSelector((state) => state?.loanproduct?.loanproducts);
+  const loans = useSelector((state) => state?.loanproduct?.loanproducts);
 
-  console.log("customers", customers);
+  console.log("customers", loans);
 
-  const merchants = useSelector((state) => state?.merchant?.merchants);
   const loanAdded = useSelector(
     (state) => state?.loanproduct?.success?.addLoanProduct
   );
   const loanUpdated = useSelector(
-    (state) => state?.loanproduct?.success?.updateALoan
+    (state) => state?.loanproduct?.success?.updateLoanProduct
   );
   const loanDeleted = useSelector(
     (state) => state?.loanproduct?.success?.deleteALoan
@@ -69,14 +65,18 @@ const LoanProduct = () => {
       description: editingLoan?.description || "",
       shortDesc: editingLoan?.shortDesc || "",
       name: editingLoan?.name || "",
-      interestRate: editingLoan?.interestRate || "",
-      status: editingLoan?.status || "PENDING",
+      interestRate: editingLoan?.interestRate || 1,
+      status: editingLoan?.status || "APPROVED",
     },
     enableReinitialize: true,
     validationSchema: LOAN_SCHEMA,
     onSubmit: (values) => {
+      console.log("Form Submitted: ", values);
+
+      alert("values!!!");
+
       if (editingLoan) {
-        dispatch(updateLoanProduct({ name: editingLoan.name, data: values }));
+        dispatch(updateLoanProduct(values));
         dispatch(getAllPoses());
         dispatch(getAllMechants());
         dispatch(getAllCustomers());
@@ -135,6 +135,7 @@ const LoanProduct = () => {
     Array.isArray(loans) &&
     loans.map((loan, index) => ({
       key: index + 1,
+      id: loan.id,
       description: loan.description,
       shortDesc: loan.shortDesc,
       name: loan.name,
@@ -152,7 +153,7 @@ const LoanProduct = () => {
           </button>
           <button
             onClick={() => {
-              setSelectedLoanId(loan.name);
+              setSelectedLoanId(loan.id);
               dispatch(deleteALoan(loan.name));
             }}
           >

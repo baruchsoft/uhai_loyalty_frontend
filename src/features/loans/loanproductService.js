@@ -13,7 +13,7 @@ const updateLoanProduct = async (posTypeData) => {
   }
 };
 const getLoanProducts = async () => {
-  const response = await newRequest.get(`loan-products`);
+  const response = await newRequest.get(`loan-products/status/PENDING`);
   if (response && response.data) {
     return response.data;
   }

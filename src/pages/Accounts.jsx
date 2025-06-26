@@ -22,6 +22,10 @@ const columns = [
   { title: "Balance", dataIndex: "balance" },
   { title: "Account Name", dataIndex: "accountName" },
   { title: "Account Type", dataIndex: "accountType" },
+  { title: "BankCode", dataIndex: "bankCode" },
+  { title: "BankBranchCode ", dataIndex: "bankBranchCode" },
+  { title: "Currency ", dataIndex: "currency" },
+  { title: "Status", dataIndex: "status" },
   { title: "Action", dataIndex: "action" },
 ];
 
@@ -32,11 +36,15 @@ const ACCOUNT_SCHEMA = Yup.object().shape({
   accountType: Yup.string()
     .oneOf(["ACTIVE", "INACTIVE"], "Select a valid account type.")
     .required("Account type is required."),
+  bankCode: Yup.string().required("Please provide the bankCode."),
+  bankBranchCode: Yup.string().required("Please provide the bankBranchCode."),
+  currency: Yup.string().required("Please provide the currency."),
+  accountNumber: Yup.string().required("Please provide the accountNumber"),
+  status: Yup.string().required("Please provide the owner type."),
 });
 
 const Accounts = () => {
   const dispatch = useDispatch();
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedAccountCode, setSelectedAccountCode] = useState(null);
@@ -67,10 +75,15 @@ const Accounts = () => {
     initialValues: {
       id: editingAccount?.id || "",
       ownerType: editingAccount?.ownerType || "",
+      accountNumber: editingAccount?.accountNumber || "",
+      bankCode: editingAccount?.bankCode || "",
+      bankBranchCode: editingAccount?.bankBranchCode || "",
+      currency: editingAccount?.currency || "KES",
       ownerId: editingAccount?.ownerId || 1,
       balance: editingAccount?.balance || "",
       accountName: editingAccount?.accountName || "",
       accountType: editingAccount?.accountType || "INACTIVE",
+      status: editingAccount?.status || "APPROVED",
     },
     enableReinitialize: true,
     validationSchema: ACCOUNT_SCHEMA,
@@ -120,10 +133,14 @@ const Accounts = () => {
     accounts?.map((account, index) => ({
       key: index + 1,
       ownerType: account?.ownerType,
+      cuurency: account?.currency,
+      bankCode: account?.bankCode,
+      bankBranchCode: account?.bankBranchCode,
       ownerId: account?.ownerId,
       balance: account?.balance,
       accountName: account?.accountName,
       accountType: account?.accountType,
+      status: account?.status,
       action: (
         <div className="flex gap-4 items-center">
           <button onClick={() => showEditModal(account)}>
@@ -239,7 +256,53 @@ const Accounts = () => {
               </p>
             )}
           </div>
-
+          <div>
+            <label className="block text-sm font-semibold">
+              Account Number
+            </label>
+            <Input
+              id="accountNumber"
+              name="accountNumber"
+              onChange={formik.handleChange}
+              value={formik.values.accountNumber}
+              onBlur={formik.handleBlur}
+            />
+            {formik.touched.accountNumber && formik.errors.accountNumber && (
+              <p className="text-xs text-red-600">
+                {formik.errors.accountNumber}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-semibold">Bank Code</label>
+            <Input
+              id="bankCode"
+              name="bankCode"
+              onChange={formik.handleChange}
+              value={formik.values.bankCode}
+              onBlur={formik.handleBlur}
+            />
+            {formik.touched.bankCode && formik.errors.bankCode && (
+              <p className="text-xs text-red-600">{formik.errors.bankCode}</p>
+            )}
+          </div>
+          <div>
+            <label className="block text-sm font-semibold">
+              BranchBankCode
+            </label>
+            <Input
+              id="bankBranchCode"
+              name="bankBranchCode"
+              onChange={formik.handleChange}
+              value={formik.values.bankBranchCode}
+              onBlur={formik.handleBlur}
+            />
+            {formik.touched.bankBranchCode && formik.errors.bankBranchCode && (
+              <p className="text-xs text-red-600">
+                {formik.errors.bankBranchCode}
+              </p>
+            )}
+          </div>
           <div>
             <label className="block text-sm font-semibold">Account Type</label>
             <Select

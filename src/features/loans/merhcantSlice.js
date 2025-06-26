@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, createAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 import merchantService from "./merchantService";
 
@@ -37,8 +37,6 @@ export const getAllMechants = createAsyncThunk(
   }
 );
 
-export const resetMerchantState = createAction("Reset_all");
-
 const initialState = {
   merchants: [],
   merchant: null,
@@ -64,7 +62,16 @@ const initialState = {
 export const merchantSlice = createSlice({
   name: "merchant",
   initialState,
-  reducers: {},
+  reducers: {
+    resetMerchantState: (state) => {
+      state.loan = null;
+      state.success = {
+        addMechant: false,
+        updateMechant: false,
+      };
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getAllMechants.pending, (state) => {
@@ -117,5 +124,6 @@ export const merchantSlice = createSlice({
       .addCase(resetMerchantState, () => initialState);
   },
 });
+export const { resetMerchantState } = merchantSlice.actions;
 
 export default merchantSlice.reducer;

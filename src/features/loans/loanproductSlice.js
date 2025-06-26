@@ -64,7 +64,16 @@ const initialState = {
 export const loanproductSlice = createSlice({
   name: "loanproduct",
   initialState,
-  reducers: {},
+  reducers: {
+    resetLoanProductState: (state) => {
+      state.loan = null;
+      state.success = {
+        addLoanProduct: false,
+        updateLoanProduct: false,
+      };
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(getLoanProducts.pending, (state) => {
@@ -103,9 +112,10 @@ export const loanproductSlice = createSlice({
       })
       .addCase(addLoanProduct.fulfilled, (state, action) => {
         state.loading.addLoanProduct = false;
-        state.error.addLoanProduct = false;
+        // state.error.addLoanProduct = false;
         state.success.addLoanProduct = true;
-        state.addLoanProduct = action?.payload;
+        // state.addLoanProducts = action?.payload;
+        state.loanproducts.push(action?.payload);
         toast.success("loanproduct added successfully.");
       })
       .addCase(addLoanProduct.rejected, (state, action) => {
@@ -117,5 +127,6 @@ export const loanproductSlice = createSlice({
       .addCase(resetloanProduct, () => initialState);
   },
 });
+export const { resetLoanProductState } = loanproductSlice.actions;
 
 export default loanproductSlice.reducer;

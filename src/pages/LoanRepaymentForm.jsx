@@ -27,7 +27,7 @@ const LoanRepaymentForm = () => {
   const dispatch = useDispatch();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const accounts = useSelector((state) => state?.account?.accounts);
   const loans = useSelector((state) => state?.loan?.getAllLoans || []);
   const repayments = useSelector((state) => state?.repayment?.repayments || []);
   const repaymentAdded = useSelector(
@@ -113,6 +113,7 @@ const LoanRepaymentForm = () => {
               }))}
               value={formik.values.loanId}
               onChange={(value) => formik.setFieldValue("loanId", value)}
+              className="w-full"
             />
             <p className="text-xs text-red-600">
               {formik.touched.loanId && formik.errors.loanId}
@@ -141,27 +142,44 @@ const LoanRepaymentForm = () => {
             {formik.touched.paidAt && formik.errors.paidAt}
           </p>
 
-          <Input
-            name="fromAccount"
-            placeholder="From Account"
-            value={formik.values.fromAccount}
-            onChange={formik.handleChange}
-            type="number"
-          />
-          <p className="text-xs text-red-600">
-            {formik.touched.fromAccount && formik.errors.fromAccount}
-          </p>
-
-          <Input
-            name="toAccount"
-            placeholder="To Account"
-            value={formik.values.toAccount}
-            onChange={formik.handleChange}
-            type="number"
-          />
-          <p className="text-xs text-red-600">
-            {formik.touched.toAccount && formik.errors.toAccount}
-          </p>
+          <div>
+            <label className="text-sm font-medium">From Account</label>
+            <Select
+              placeholder="Select From Account"
+              options={
+                accounts?.map((merchant) => ({
+                  value: merchant.id,
+                  label: merchant.accountName,
+                })) || []
+              }
+              value={formik.values.fromAccount}
+              onChange={(value) => formik.setFieldValue("fromAccount", value)}
+              className="w-full"
+            />
+            {formik.touched.fromAccount && formik.errors.fromAccount && (
+              <p className="text-xs text-red-500">
+                {formik.errors.fromAccount}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="text-sm font-medium">To Account</label>
+            <Select
+              placeholder="Select To Account"
+              options={
+                accounts?.map((merchant) => ({
+                  value: merchant.id,
+                  label: merchant.accountName,
+                })) || []
+              }
+              value={formik.values.toAccount}
+              onChange={(value) => formik.setFieldValue("toAccount", value)}
+              className="w-full"
+            />
+            {formik.touched.toAccount && formik.errors.toAccount && (
+              <p className="text-xs text-red-500">{formik.errors.toAccount}</p>
+            )}
+          </div>
 
           <Input.TextArea
             name="note"
