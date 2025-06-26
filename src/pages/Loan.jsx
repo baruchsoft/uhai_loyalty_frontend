@@ -176,8 +176,11 @@ const LoanManagement = () => {
         onCancel={closeModal}
         footer={null}
       >
-        <form onSubmit={formik.handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col">
+        <form
+          onSubmit={formik.handleSubmit}
+          className="flex flex-col gap-4 mt-4"
+        >
+          <div>
             <label htmlFor="merchantId" className="text-sm font-semibold">
               Merchant
             </label>
@@ -192,7 +195,7 @@ const LoanManagement = () => {
                   .includes(input.toLowerCase())
               }
               options={
-                Array.isArray(poses)
+                Array.isArray(merchants)
                   ? merchants &&
                     merchants.map((merchant) => ({
                       value: merchant.id,
@@ -203,10 +206,10 @@ const LoanManagement = () => {
               onBlur={formik.handleBlur}
               onChange={(value) => formik.setFieldValue("merchantId", value)}
               value={formik.values.id}
-              className={`w-80 h-11 border-1.5 rounded-lg ${
+              className={`w-full ${
                 formik.touched.merchantId && formik.errors.merchantId
                   ? "border-red-600"
-                  : ""
+                  : "w-full"
               }`}
             />
             <div>
@@ -215,7 +218,7 @@ const LoanManagement = () => {
               </p>
             </div>
           </div>
-          <div className="w-full flex flex-col">
+          <div>
             <label htmlFor="customerId" className="text-sm font-semibold">
               Customer
             </label>
@@ -230,7 +233,7 @@ const LoanManagement = () => {
                   .includes(input.toLowerCase())
               }
               options={
-                Array.isArray(poses)
+                Array.isArray(customers)
                   ? customers &&
                     customers.map((customer) => ({
                       value: customer.id,
@@ -241,10 +244,10 @@ const LoanManagement = () => {
               onBlur={formik.handleBlur}
               onChange={(value) => formik.setFieldValue("customerId", value)}
               value={formik.values.id}
-              className={`w-80 h-11 border-1.5 rounded-lg ${
+              className={`w-full ${
                 formik.touched.customerId && formik.errors.customerId
                   ? "border-red-600"
-                  : ""
+                  : "w-full"
               }`}
             />
             <div>
@@ -253,7 +256,7 @@ const LoanManagement = () => {
               </p>
             </div>
           </div>
-          <div className="w-full flex flex-col">
+          <div>
             <label htmlFor="customerId" className="text-sm font-semibold">
               Loan Product
             </label>
@@ -268,7 +271,7 @@ const LoanManagement = () => {
                   .includes(input.toLowerCase())
               }
               options={
-                Array.isArray(poses)
+                Array.isArray(loanproducts)
                   ? loanproducts &&
                     loanproducts.map((customer) => ({
                       value: customer.id,
@@ -279,10 +282,10 @@ const LoanManagement = () => {
               onBlur={formik.handleBlur}
               onChange={(value) => formik.setFieldValue("loanProductId", value)}
               value={formik.values.id}
-              className={`w-80 h-11 border-1.5 rounded-lg ${
+              className={`w-full ${
                 formik.touched.loanProductId && formik.errors.loanProductId
                   ? "border-red-600"
-                  : ""
+                  : "w-full"
               }`}
             />
             <div>
@@ -317,10 +320,10 @@ const LoanManagement = () => {
               onBlur={formik.handleBlur}
               onChange={(value) => formik.setFieldValue("posCode", value)}
               value={formik.values.posCode}
-              className={`w-80 h-11 border-1.5 rounded-lg ${
+              className={`w-full ${
                 formik.touched.posCode && formik.errors.posCode
                   ? "border-red-600"
-                  : ""
+                  : "w-full"
               }`}
             />
             <div>
